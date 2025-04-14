@@ -8,16 +8,15 @@
 
 .footer {
   background-color: #EFF1F5;
-  border: 1px solid black;
   text-align: center;
   padding: 1rem;
 }
 
 .header{
   background-color: #EFF1F5;
-  border: 1px solid black;
   text-align: left;
   padding: 1rem;
+
 }
 
 .logo {
