@@ -51,3 +51,9 @@
   font-size: 0.875rem;
   color: #4B5563; /* tailwind gray-600 */
 }
+
+.panel-wrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+}

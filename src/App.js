@@ -1,10 +1,12 @@
 import React from "react";
 import "./App.css";
 import CalendarExample from "./components/calendar";
+import ParametersPanel from "./components/ParametersPanel";
 
 
 export default function App() {
   return (
+
       <div className="container">
         {/* Header */}
         <header className="header">
@@ -15,14 +17,11 @@ export default function App() {
 
         {/* Main Content Placeholder */}
         <main className="main">
-
-            <CalendarExample />
-
-
-          {/* Button */}
-          <button className="show-button">
-            Show Graph
-          </button>
+            <div className="panel-wrapper">
+                <ParametersPanel />
+                <CalendarExample />
+            </div>
+            <button className="show-button">Show Graph</button>
         </main>
 
         {/* Footer */}
