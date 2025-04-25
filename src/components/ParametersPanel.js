@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Select from 'react-select';
 import { lithuanianCities } from './cities';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';  // додав імпорти для графіка
 import './ParametersPanel.css';
 
 function ParametersPanel({ selectedDate }) {
@@ -10,6 +11,7 @@ function ParametersPanel({ selectedDate }) {
     const [error, setError] = useState('');
     const [selectedGraph, setSelectedGraph] = useState('');
     const [selectedMorphotypes, setSelectedMorphotypes] = useState([]);
+    const [weatherData, setWeatherData] = useState([]);
 
     const weatherParameters = [
         "Temperature",
@@ -44,23 +46,17 @@ function ParametersPanel({ selectedDate }) {
         try {
             const res = await fetch("http://localhost:3001/weather", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ stationCode: selectedCity.code })
             });
-
             const data = await res.json();
-            setWeather(data); // ✅ зберігаємо погоду
-            setError('');     // очищаємо попередні помилки
+            setWeatherData(data);
+            setError('');
         } catch (err) {
-            setError('Failed to load weather data'); // ✅ обробка помилки
+            setError('Failed to load weather data');
             console.error(err);
         }
     };
-
-
-
 
     return (
         <div className="parameters-panel">
@@ -134,25 +130,31 @@ function ParametersPanel({ selectedDate }) {
 
                 {error && <div className="error">{error}</div>}
 
-                {weather && (
-                    <div className="weather-data">
-                        <h2>Weather Data</h2>
+                {selectedGraph === 'line' && weatherData.length > 0 && (
+                    <LineChart
+                        width={600}
+                        height={300}
+                        data={weatherData}
+                        margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
+                    >
+                        <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
+                        <XAxis dataKey="time" tickFormatter={(t) => t.slice(11, 16)} />
+                        <YAxis />
+                        <Tooltip />
+                        <Legend />
                         {selectedParams.includes("Temperature") && (
-                            <p>Temperature: {weather.temperature}°C</p>
+                            <Line type="monotone" dataKey="temperature" stroke="#8884d8" name="Temperature (°C)" />
                         )}
                         {selectedParams.includes("Humidity") && (
-                            <p>Humidity: {weather.humidity}%</p>
+                            <Line type="monotone" dataKey="humidity" stroke="#82ca9d" name="Humidity (%)" />
                         )}
                         {selectedParams.includes("Precipitation") && (
-                            <p>Precipitation: {weather.precipitation} mm</p>
-                        )}
-                        {selectedParams.includes("Wind direction") && (
-                            <p>Wind Direction: {weather.wind_direction}</p>
+                            <Line type="monotone" dataKey="precipitation" stroke="#ff7300" name="Precipitation (mm)" />
                         )}
                         {selectedParams.includes("Wind speed") && (
-                            <p>Wind Speed: {weather.wind_speed} km/h</p>
+                            <Line type="monotone" dataKey="wind_speed" stroke="#387908" name="Wind speed (km/h)" />
                         )}
-                    </div>
+                    </LineChart>
                 )}
             </div>
         </div>

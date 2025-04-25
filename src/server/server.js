@@ -15,18 +15,16 @@ app.post('/weather', async (req, res) => {
         const response = await fetch(`https://api.meteo.lt/v1/stations/${stationCode}/observations/latest`);
         const data = await response.json();
 
-        const latest = data.observations[data.observations.length - 1];
+        const observations = data.observations.map(obs => ({
+            time: obs.observationTimeUtc,
+            temperature: obs.airTemperature,
+            humidity: obs.relativeHumidity,
+            precipitation: obs.precipitation,
+            wind_speed: obs.windSpeed,
+            wind_direction: obs.windDirection
+        }));
 
-        const result = {
-            temperature: latest.airTemperature,
-            humidity: latest.relativeHumidity,
-            precipitation: latest.precipitation,
-            wind_speed: latest.windSpeed,
-            wind_direction: latest.windDirection,
-            timestamp: latest.observationTimeUtc
-        };
-
-        res.json(result);
+        res.json(observations);
     } catch (error) {
         console.error("Failed to fetch weather data:", error);
         res.status(500).json({ error: 'Failed to fetch weather data' });
