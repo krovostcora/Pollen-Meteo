@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import Select from 'react-select';
-import axios from 'axios';
 import { lithuanianCities } from './cities';
 import './ParametersPanel.css';
 
@@ -40,24 +39,28 @@ function ParametersPanel({ selectedDate }) {
     };
 
     const handleShowGraph = async () => {
-        setError('');
-        setWeather(null);
-
-        if (!selectedCity || !selectedDate) {
-            setError('Please select city and date');
-            return;
-        }
+        if (!selectedCity) return;
 
         try {
-            const response = await axios.post('http://localhost:3001/weather', {
-                city: selectedCity.value,
-                date: selectedDate,
+            const res = await fetch("http://localhost:3001/weather", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ stationCode: selectedCity.code })
             });
-            setWeather(response.data);
+
+            const data = await res.json();
+            setWeather(data); // ✅ зберігаємо погоду
+            setError('');     // очищаємо попередні помилки
         } catch (err) {
-            setError('Error fetching weather data');
+            setError('Failed to load weather data'); // ✅ обробка помилки
+            console.error(err);
         }
     };
+
+
+
 
     return (
         <div className="parameters-panel">

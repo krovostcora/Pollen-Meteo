@@ -1,26 +1,36 @@
 const express = require('express');
 const cors = require('cors');
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+
 const app = express();
 const PORT = 3001;
 
 app.use(cors());
 app.use(express.json());
 
-app.post('/weather', (req, res) => {
-    const { city, date } = req.body;
+app.post('/weather', async (req, res) => {
+    const { stationCode } = req.body;
 
-    // Це тимчасова відповідь (заглушка). Тут має бути реальна логіка або доступ до бази/зовнішнього API.
-    const dummyWeather = {
-        city,
-        date,
-        temperature: 21,
-        humidity: 60,
-        precipitation: 2,
-        wind_direction: 'NW',
-        wind_speed: 15
-    };
+    try {
+        const response = await fetch(`https://api.meteo.lt/v1/stations/${stationCode}/observations/latest`);
+        const data = await response.json();
 
-    res.json(dummyWeather);
+        const latest = data.observations[data.observations.length - 1];
+
+        const result = {
+            temperature: latest.airTemperature,
+            humidity: latest.relativeHumidity,
+            precipitation: latest.precipitation,
+            wind_speed: latest.windSpeed,
+            wind_direction: latest.windDirection,
+            timestamp: latest.observationTimeUtc
+        };
+
+        res.json(result);
+    } catch (error) {
+        console.error("Failed to fetch weather data:", error);
+        res.status(500).json({ error: 'Failed to fetch weather data' });
+    }
 });
 
 app.listen(PORT, () => {
