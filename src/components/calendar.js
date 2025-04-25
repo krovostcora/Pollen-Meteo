@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import { DatePicker } from '@mantine/dates';
 import './Calendar.css';
 
@@ -14,7 +14,10 @@ function CalendarExample({ onDateSelect }) {
 
 
     return (
+
         <div className="calendar-container">
+
+            <h2 className="section-title">Select Dates</h2>
             {/* Always visible selected range */}
             <div className="selected-range">
                 <div className="date-column">

@@ -1,9 +1,11 @@
-/* App.css */
+/* СТИЛІ ДЛЯ СВІТЛОЇ ТЕМИ */
 
 .container {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  background-color: #ffffff; /* Світла тема */
+  color: black; /* Світлий текст */
 }
 
 .footer {
@@ -12,11 +14,10 @@
   padding: 1rem;
 }
 
-.header{
+.header {
   background-color: #EFF1F5;
   text-align: left;
   padding: 1rem;
-
 }
 
 .logo {
@@ -56,4 +57,78 @@
   display: flex;
   align-items: flex-start;
   gap: 24px;
+  max-width: 1200px;
+  width: 100%;
+}
+
+.header {
+  background-color: #EFF1F5;
+  text-align: left;
+  padding: 1rem;
+  display: flex;  /* Змінюємо на flex для вирівнювання елементів */
+  justify-content: space-between;  /* Розміщуємо елементи по краях */
+  align-items: center;  /* Вирівнюємо елементи по вертикалі */
+}
+
+.logo {
+  color: black;
+  font-family: 'Inter', sans-serif;
+  font-size: 30px;
+  font-weight: bold;
+  line-height: 30px;
+}
+
+.show-button {
+  width: 160px;  /* Зменшуємо ширину кнопки */
+  height: 40px;
+  background-color: #1C1B1F;
+  color: white;
+  font-size: 1rem;
+  font-weight: 500;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+
+/* Кнопка для темної теми */
+.dark-mode-toggle {
+  background-color: #333;
+  color: white;
+  padding: 8px 16px;
+  font-size: 14px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.dark-mode-toggle:hover {
+  background-color: #555;
+}
+
+/* СТИЛІ ДЛЯ ТЕМНОЇ ТЕМИ */
+
+.dark .container {
+  background-color: #1A1A1A; /* Темна тема */
+  color: white; /* Темний текст */
+}
+
+.dark .header {
+  background-color: #333;
+  color: white;
+}
+
+.dark .footer {
+  background-color: #222;
+  color: white;
+}
+
+.dark .show-button {
+  background-color: #444;
+  color: white;
+}
+
+.dark .main {
+  background-color: #222;
+  color: white;
 }

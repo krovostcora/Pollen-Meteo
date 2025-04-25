@@ -3,6 +3,7 @@ import SelectParams from './SelectParams';
 import WeatherGraph from './WeatherGraph';
 import './ParametersPanel.css';
 
+
 const ParametersPanel = ({ selectedDate }) => {
     const [selectedCity, setSelectedCity] = useState(null);
     const [selectedParams, setSelectedParams] = useState([]);

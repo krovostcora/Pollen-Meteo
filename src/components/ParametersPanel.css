@@ -1,9 +1,10 @@
 .parameters-panel {
-    display: flex;
+    display: block;
     flex-direction: column;
     padding: 32px 24px;
     min-width: 280px;
     background-color: white;
+    width: 70%;
 }
 
 .section {
@@ -22,6 +23,7 @@
     flex-direction: column;
     gap: 8px;
     margin-bottom: 24px;
+    width: 50px;
 }
 
 .location-label {
@@ -37,6 +39,7 @@
     background-color: #f9f9f9;
     appearance: none;
 }
+
 .block {
     display: flex;
     flex-direction: column;
@@ -76,10 +79,59 @@
     height: 16px;
 }
 
-.block-select {
-    font-size: 16px;
-}
 .block-select:hover {
     background-color: #e0e0e0;
 }
 
+.graph-section {
+    margin-top: 32px;
+    padding: 24px;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    background-color: #fafafa;
+}
+
+.column-group {
+    display: flex;
+    gap: 24px;
+}
+
+.middle-col, .right-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.graph-section {
+    position: absolute;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 20px;
+}
+
+/* Dark Mode */
+.dark .parameters-panel {
+    background-color: #222;
+}
+
+.dark .location-select, .dark .block-select {
+    background-color: #444;
+    color: #FFF;
+}
+
+.dark .location-label, .dark .block-label {
+    color: #E0E0E0;
+}
+
+.dark .section-title {
+    color: #E0E0E0;
+}
+
+.dark .graph-section {
+    background-color: #444;
+    border: 1px solid #555;
+}

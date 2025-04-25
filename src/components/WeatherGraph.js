@@ -55,9 +55,9 @@ const WeatherGraph = ({ weatherData, selectedGraph, selectedParams }) => {
     };
 
     const commonProps = {
-        width: 600,
-        height: 300,
-        margin: { top: 5, right: 20, left: 10, bottom: 5 }
+        width: 1000,
+        height: 500,
+        margin: { top: 5, right: 5, left: -40, bottom: 5 }
     };
 
     const renderChart = () => {

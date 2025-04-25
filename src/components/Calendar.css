@@ -1,39 +1,31 @@
-/* Container for the whole calendar */
 .calendar-container {
-    padding: 20px; /* Add padding around the calendar */
-    position: relative; /* Position the container relative to its parent */
-    align-content: flex-start; /* Align content at the top */
+    padding: 20px;
+    position: relative;
+    align-content: flex-start;
 }
 
-/* Custom styles for the DatePicker component */
 .custom-datepicker {
-    filter: drop-shadow(35px 45px 73px rgba(32, 32, 35, 0.07)); /* Apply a shadow for depth */
-    background: #EFF1F5; /* Set a soft background color */
-    border-radius: 10px 10px; /* Round the corners of the DatePicker */
+    filter: drop-shadow(35px 45px 73px rgba(32, 32, 35, 0.07));
+    background: #EFF1F5;
+    border-radius: 10px 10px;
 }
 
-/* < > */
 .mantine-focus-auto path {
     color: #007AFF;
 }
 
-/* Style the weekdays in the DatePicker */
 .mantine-DatePicker-weekdaysRow .mantine-DatePicker-weekday {
-    color: #007AFF !important; /* Apply blue color to weekdays */
-    font-size: 1.1rem !important; /* Slightly increase the font size */
-    font-style: revert; /* Reset the font style to default */
+    color: #007AFF !important;
+    font-size: 1.1rem !important;
+    font-style: revert;
 }
 
-
-/* Selected range display above calendar */
 .selected-range {
     display: flex;
-    /*justify-content: space-between;*/
     margin-bottom: 1.5rem;
-    /*padding: 12px 0;*/
     width: 100%;
     max-width: 260px;
-    min-height: 70px; /* prevent layout shift */
+    min-height: 70px;
 }
 
 .date-column {
@@ -41,7 +33,7 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    min-width: 100px; /* optional, ensures space */
+    min-width: 100px;
 }
 
 .label {
@@ -54,10 +46,33 @@
     color: #000;
     font-size: 1rem;
     font-weight: bold;
-    min-height: 1.2rem; /* reserve space for date text */
+    min-height: 1.2rem;
 }
+
 .placeholder {
     color: #A09CAB;
     font-style: italic;
     font-size: 1rem;
+}
+
+/* Dark Mode */
+.dark .calendar-container {
+    background-color: #222;
+}
+
+.dark .custom-datepicker {
+    background: #222;
+    border-radius: 10px 10px;
+}
+
+.dark .mantine-DatePicker-weekdaysRow .mantine-DatePicker-weekday {
+    color: #66A3FF !important;
+}
+
+.dark .label, .dark .placeholder {
+    color: #E0E0E0;
+}
+
+.dark .date {
+    color: #FFFFFF;
 }

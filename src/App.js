@@ -1,35 +1,41 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import "./App.css";
 import CalendarExample from "./components/calendar";
 import ParametersPanel from "./components/ParametersPanel";
 
-
 export default function App() {
     const [selectedDate, setSelectedDate] = useState('');
-  return (
+    const [isDarkMode, setIsDarkMode] = useState(false); // Стан для темної теми
 
-      <div className="container">
-        {/* Header */}
-        <header className="header">
-          <div className="logo">
-            Pollen<br />&<br />Meteo
-          </div>
-        </header>
+    // Функція для перемикання теми
+    const toggleDarkMode = () => {
+        setIsDarkMode((prevMode) => !prevMode);
+    };
 
-        {/* Main Content Placeholder */}
-        <main className="main">
-            <div className="panel-wrapper">
-                <CalendarExample onDateSelect={setSelectedDate} />
-                <ParametersPanel selectedDate={selectedDate} />
+    return (
+        <div className={`container ${isDarkMode ? 'dark' : ''}`}>
+            {/* Header */}
+            <header className={`header ${isDarkMode ? 'dark' : ''}`}>
+                <div className="logo">
+                    Pollen<br />&<br />Meteo
+                </div>
+                <button className="dark-mode-toggle" onClick={toggleDarkMode}>
+                    {isDarkMode ? 'Light Mode' : 'Dark Mode'}
+                </button>
+            </header>
 
+            {/* Main Content Placeholder */}
+            <main className={`main ${isDarkMode ? 'dark' : ''}`}>
+                <div className="panel-wrapper">
+                    <ParametersPanel selectedDate={selectedDate} />
+                    <CalendarExample onDateSelect={setSelectedDate} />
+                </div>
+            </main>
 
-            </div>
-        </main>
-
-        {/* Footer */}
-        <footer className="footer">
-          Pollen&Meteo 2025
-        </footer>
-      </div>
-  );
+            {/* Footer */}
+            <footer className={`footer ${isDarkMode ? 'dark' : ''}`}>
+                Pollen&Meteo 2025
+            </footer>
+        </div>
+    );
 }

@@ -1,7 +1,8 @@
 .weather-graph {
-    width: 100%;
-    margin-top: 20px;
+    position: absolute;
+    width: 100vw;
     display: flex;
+    margin-top: 20px;
     justify-content: center;
 }
 
@@ -9,4 +10,50 @@
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     background-color: #fff;
+}
+
+.weather-graph {
+    background-color: yellow;
+    height: 50px;
+    padding-top: 25px;
+    color: black;
+    width: 100%;
+    position: relative;
+    z-index: 1;
+}
+
+.weather-graph:before,
+.weather-graph:after {
+    background: yellow;
+    height: 50px;
+    padding-top: 25px;
+    width: 40px;
+    display: block;
+    position: absolute;
+    z-index: -1;
+    content: '';
+    top: 0;
+}
+
+.weather-graph:before {
+    left: -12.5%;
+}
+
+.weather-graph:after {
+    right: -12.6%;
+}
+
+/* Dark Mode */
+.dark .weather-graph {
+    background-color: #333;
+    color: white;
+}
+
+.dark .weather-graph svg {
+    background-color: #444;
+}
+
+.dark .weather-graph:before,
+.dark .weather-graph:after {
+    background: #444;
 }
