@@ -9,10 +9,19 @@ app.use(cors());
 app.use(express.json());
 
 app.post('/weather', async (req, res) => {
-    const { stationCode } = req.body;
+    const { stationCode, date } = req.body;
+
+    const url = date
+        ? `https://api.meteo.lt/v1/stations/${stationCode}/observations/${date}`
+        : `https://api.meteo.lt/v1/stations/${stationCode}/observations/latest`;
 
     try {
-        const response = await fetch(`https://api.meteo.lt/v1/stations/${stationCode}/observations/latest`);
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            return res.status(response.status).json({ error: 'Data not found for this date' });
+        }
+
         const data = await response.json();
 
         const observations = data.observations.map(obs => ({
@@ -30,6 +39,7 @@ app.post('/weather', async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch weather data' });
     }
 });
+
 
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);

@@ -7,11 +7,11 @@ function CalendarExample({ onDateSelect }) {
     const [value, setValue] = useState([null, null]);
 
     useEffect(() => {
-        // sending the first date to the parent component
-        if (value[0]) {
-            onDateSelect(value[0].toISOString().split('T')[0]); // yyyy-mm-dd
+        if (value[0] && value[1]) {
+            onDateSelect(value); // [start, end]
         }
     }, [value, onDateSelect]);
+
 
     return (
         <div className="calendar-container">
