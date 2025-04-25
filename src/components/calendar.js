@@ -1,10 +1,17 @@
-import { useState } from 'react';
+import {useEffect, useState} from 'react';
 import { DatePicker } from '@mantine/dates';
 import './Calendar.css';
 
-function CalendarExample() {
+function CalendarExample({ onDateSelect }) {
     // Initialize state with an array of two elements or null
     const [value, setValue] = useState([null, null]);
+
+    useEffect(() => {
+        // sending the first date to the parent component
+        if (value[0]) {
+            onDateSelect(value[0].toISOString().split('T')[0]); // yyyy-mm-dd
+        }
+    }, [value, onDateSelect]);
 
     return (
         <div className="calendar-container">

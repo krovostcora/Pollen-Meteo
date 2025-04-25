@@ -1,10 +1,11 @@
-import React from "react";
+import React, {useState} from "react";
 import "./App.css";
 import CalendarExample from "./components/calendar";
 import ParametersPanel from "./components/ParametersPanel";
 
 
 export default function App() {
+    const [selectedDate, setSelectedDate] = useState('');
   return (
 
       <div className="container">
@@ -18,10 +19,11 @@ export default function App() {
         {/* Main Content Placeholder */}
         <main className="main">
             <div className="panel-wrapper">
-                <ParametersPanel />
-                <CalendarExample />
+                <CalendarExample onDateSelect={setSelectedDate} />
+                <ParametersPanel selectedDate={selectedDate} />
+
+
             </div>
-            <button className="show-button">Show Graph</button>
         </main>
 
         {/* Footer */}
