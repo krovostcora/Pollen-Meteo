@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import { DatePicker } from '@mantine/dates';
-import './Calendar.css';
+import '../styles/Calendar.css';
 
 function CalendarExample({ onDateSelect }) {
     // Initialize state with an array of two elements or null

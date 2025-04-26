@@ -1,5 +1,5 @@
 import React from 'react';
-import './WeatherGraph.css';
+import '../styles/WeatherGraph.css';
 
 import {
     LineChart, Line,
