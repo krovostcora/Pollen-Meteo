@@ -1,8 +1,60 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Select from 'react-select';
 import { lithuanianCities } from './cities';
 
+const customStyles = (isDarkTheme: boolean) => ({
+    control: (provided: any) => ({
+        ...provided,
+        backgroundColor: isDarkTheme ? '#333333' : '#EFF1F5',
+        borderColor: isDarkTheme ? '#555555' : '#ccc',
+        color: isDarkTheme ? '#FFFFFF' : '#000000',
+    }),
+    menu: (provided: any) => ({
+        ...provided,
+        backgroundColor: isDarkTheme ? '#333333' : '#FFFFFF',
+        color: isDarkTheme ? '#FFFFFF' : '#000000',
+    }),
+    option: (provided: any, state: any) => ({
+        ...provided,
+        backgroundColor: state.isFocused
+            ? (isDarkTheme ? '#444444' : '#f0f0f0')
+            : (isDarkTheme ? '#333333' : '#FFFFFF'),
+        color: isDarkTheme ? '#FFFFFF' : '#000000',
+    }),
+    singleValue: (provided: any) => ({
+        ...provided,
+        color: isDarkTheme ? '#FFFFFF' : '#000000',
+    }),
+    placeholder: (provided: any) => ({
+        ...provided,
+        color: isDarkTheme ? '#CCCCCC' : '#888888',
+    }),
+    indicatorSeparator: (provided: any) => ({
+        ...provided,
+        backgroundColor: isDarkTheme ? '#555555' : '#cccccc',
+    }),
+    dropdownIndicator: (provided: any) => ({
+        ...provided,
+        color: isDarkTheme ? '#CCCCCC' : '#555555',
+    }),
+});
+
 const SelectParams = ({ selectedCity, setSelectedCity, selectedGraph, setSelectedGraph, selectedParams, setSelectedParams }) => {
+    const [isDarkTheme, setIsDarkTheme] = useState(false);
+
+    useEffect(() => {
+        const updateTheme = () => {
+            setIsDarkTheme(document.body.classList.contains('dark'));
+        };
+
+        updateTheme(); // check theme on load
+
+        const observer = new MutationObserver(updateTheme);
+        observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+
+        return () => observer.disconnect();
+    }, []);
+
     const weatherParameters = [
         "Temperature",
         "Humidity",
@@ -34,6 +86,7 @@ const SelectParams = ({ selectedCity, setSelectedCity, selectedGraph, setSelecte
                     className="block-select"
                     onChange={setSelectedCity}
                     value={selectedCity}
+                    styles={customStyles(isDarkTheme)}
                 />
             </div>
 

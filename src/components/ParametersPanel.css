@@ -135,3 +135,7 @@
     background-color: #444;
     border: 1px solid #555;
 }
+
+.dark .checkbox-label{
+    color: #E0E0E0;
+}

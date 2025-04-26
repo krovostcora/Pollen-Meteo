@@ -2,12 +2,12 @@ import React, { useState } from "react";
 import "./App.css";
 import CalendarExample from "./components/calendar";
 import ParametersPanel from "./components/ParametersPanel";
+import ThemeToggle from "./components/ThemeToggle";
 
 export default function App() {
     const [selectedDate, setSelectedDate] = useState('');
-    const [isDarkMode, setIsDarkMode] = useState(false); // Стан для темної теми
+    const [isDarkMode, setIsDarkMode] = useState(false);
 
-    // Функція для перемикання теми
     const toggleDarkMode = () => {
         setIsDarkMode((prevMode) => !prevMode);
     };
@@ -19,9 +19,7 @@ export default function App() {
                 <div className="logo">
                     Pollen<br />&<br />Meteo
                 </div>
-                <button className="dark-mode-toggle" onClick={toggleDarkMode}>
-                    {isDarkMode ? 'Light Mode' : 'Dark Mode'}
-                </button>
+                <ThemeToggle isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
             </header>
 
             {/* Main Content Placeholder */}
