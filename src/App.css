@@ -94,3 +94,44 @@
 .dark .logo {
   color: #ffffff;
 }
+
+/* Responsive styles for mobile */
+@media (max-width: 768px) {
+  .main {
+    padding: 1rem;
+  }
+
+  .panel-wrapper {
+    flex-direction: column-reverse;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .parameters-panel {
+    width: 100%;
+    padding: 24px 16px;
+  }
+
+  .graph-section {
+    width: 100%;
+    padding: 16px;
+    margin-top: 16px;
+    position: relative;
+    margin-left: 0;
+  }
+
+  .weather-graph {
+    width: 100%;
+    margin-top: 16px;
+  }
+
+  .block, .checkbox-list, .column-group, .middle-col, .right-col {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .show-button {
+    width: 100%;
+    max-width: 300px;
+  }
+}
