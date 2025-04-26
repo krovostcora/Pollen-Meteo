@@ -145,12 +145,14 @@ const SelectParams = ({ selectedCity, setSelectedCity, selectedGraph, setSelecte
                     <option value="scatter">Scatter plot</option>
                 </select>
 
-                {(selectedCity || selectedGraph || selectedParams.length > 0) && (
-                    <button className="reset-button" onClick={handleReset}>
-                        Reset filters
-                    </button>
-                )}
+                <button
+                    className={`reset-button ${(selectedCity || selectedGraph || selectedParams.length > 0) ? 'visible' : ''}`}
+                    onClick={handleReset}
+                >
+                    Reset filters
+                </button>
             </div>
+
 
 
         </div>

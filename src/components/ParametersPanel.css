@@ -113,6 +113,30 @@
     padding-top: 20px;
 }
 
+.reset-button {
+    margin-top: 10px;
+    padding: 8px 16px;
+    background-color: #ff6b6b;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    opacity: 0;
+    transform: scale(0.95);
+    transition: opacity 0.3s ease, transform 0.3s ease, background-color 0.3s ease;
+    display: inline-block;
+}
+
+.reset-button.visible {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.reset-button:hover {
+    background-color: #ff4c4c;
+}
+
+
 /* Dark Mode */
 .dark .parameters-panel {
     background-color: #222;
