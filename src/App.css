@@ -134,4 +134,12 @@
     width: 100%;
     max-width: 300px;
   }
+  .panel-wrapper {
+    transition: all 0.5s ease;
+  }
+
+  .graph-section, .parameters-panel {
+    transition: all 0.5s ease;
+  }
+
 }

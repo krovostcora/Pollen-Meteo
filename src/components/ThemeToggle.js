@@ -1,7 +1,23 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./ThemeToggle.css";
 
-export default function ThemeToggle({ isDarkMode, toggleDarkMode }) {
+export default function ThemeToggle() {
+    const [isDarkMode, setIsDarkMode] = useState(false);
+
+    const toggleDarkMode = () => {
+        const newMode = !isDarkMode;
+        setIsDarkMode(newMode);
+        document.body.classList.toggle('dark', newMode);
+        localStorage.setItem('theme', newMode ? 'dark' : 'light');
+    };
+
+    useEffect(() => {
+        const savedTheme = localStorage.getItem('theme');
+        const isDark = savedTheme === 'dark';
+        setIsDarkMode(isDark);
+        document.body.classList.toggle('dark', isDark);
+    }, []);
+
     return (
         <div>
             <input

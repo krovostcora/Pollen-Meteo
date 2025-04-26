@@ -74,6 +74,16 @@ const SelectParams = ({ selectedCity, setSelectedCity, selectedGraph, setSelecte
                 : [...prev, param]
         );
     };
+    const handleReset = () => {
+        setSelectedCity(null);
+        setSelectedGraph('');
+        setSelectedParams([]);
+        localStorage.removeItem('selectedCity');
+        localStorage.removeItem('selectedGraph');
+        localStorage.removeItem('selectedParams');
+    };
+
+
 
     return (
         <div className="section">
@@ -134,7 +144,15 @@ const SelectParams = ({ selectedCity, setSelectedCity, selectedGraph, setSelecte
                     <option value="bar">Bar chart</option>
                     <option value="scatter">Scatter plot</option>
                 </select>
+
+                {(selectedCity || selectedGraph || selectedParams.length > 0) && (
+                    <button className="reset-button" onClick={handleReset}>
+                        Reset filters
+                    </button>
+                )}
             </div>
+
+
         </div>
     );
 };
