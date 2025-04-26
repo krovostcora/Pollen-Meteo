@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import SelectParams from './SelectParams';
-import WeatherGraph from './WeatherGraph';
-import './ParametersPanel.css';
+import SelectParams from '../components/SelectParams';
+import WeatherGraph from '../components/WeatherGraph';
+import '../styles/ParametersPanel.css';
+import CalendarExample from "../components/calendar";
+import LocationSelector from "../components/parameters/LocationSelector";
 
 
-const ParametersPanel = ({ selectedDate }) => {
+
+const MainView = () => {
     const [selectedCity, setSelectedCity] = useState(null);
+    const [selectedDate, setSelectedDate] = useState('');
     const [selectedParams, setSelectedParams] = useState([]);
     const [selectedGraph, setSelectedGraph] = useState('');
     const [weatherData, setWeatherData] = useState([]);
@@ -57,31 +61,33 @@ const ParametersPanel = ({ selectedDate }) => {
 
 
     return (
+        <div className="section">
+            <div className="parameters-panel">
+                <LocationSelector selectedCity={selectedCity} setSelectedCity={setSelectedCity} />
+                <SelectParams
+                    selectedCity={selectedCity}
+                    setSelectedCity={setSelectedCity}
+                    selectedGraph={selectedGraph}
+                    setSelectedGraph={setSelectedGraph}
+                    selectedParams={selectedParams}
+                    setSelectedParams={setSelectedParams}
+                />
 
-        <div className="parameters-panel">
+                <button className="show-button" onClick={handleShowGraph}>
+                    Show Graph
+                </button>
 
-            <SelectParams
-                selectedCity={selectedCity}
-                setSelectedCity={setSelectedCity}
-                selectedGraph={selectedGraph}
-                setSelectedGraph={setSelectedGraph}
-                selectedParams={selectedParams}
-                setSelectedParams={setSelectedParams}
-            />
+                {error && <div className="error">{error}</div>}
 
-            <button className="show-button" onClick={handleShowGraph}>
-                Show Graph
-            </button>
-
-            {error && <div className="error">{error}</div>}
-
-            <WeatherGraph
-                weatherData={weatherData}
-                selectedGraph={selectedGraph}
-                selectedParams={selectedParams}
-            />
-        </div>
+                <WeatherGraph
+                    weatherData={weatherData}
+                    selectedGraph={selectedGraph}
+                    selectedParams={selectedParams}
+                />
+            </div>
+            <CalendarExample onDateSelect={setSelectedDate} />
+    </div>
     );
 };
 
-export default ParametersPanel;
+export default MainView;

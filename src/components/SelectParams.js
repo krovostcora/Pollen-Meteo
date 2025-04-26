@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Select from 'react-select';
 import { lithuanianCities } from './cities';
+import LocationSelector from './parameters/LocationSelector';
 
 const customStyles = (isDarkTheme: boolean) => ({
     control: (provided: any) => ({
@@ -88,17 +89,6 @@ const SelectParams = ({ selectedCity, setSelectedCity, selectedGraph, setSelecte
     return (
         <div className="section">
             <h2 className="section-title">Select Data Parameters</h2>
-            <div className="block">
-                <label className="block-label">Location</label>
-                <Select
-                    options={lithuanianCities}
-                    placeholder="Start typing..."
-                    className="block-select"
-                    onChange={setSelectedCity}
-                    value={selectedCity}
-                    styles={customStyles(isDarkTheme)}
-                />
-            </div>
 
             <div className="block">
                 <label className="block-label">Morphotypes</label>

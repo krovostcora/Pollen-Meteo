@@ -1,11 +1,9 @@
 import React, { useState } from "react";
 import "./App.css";
-import CalendarExample from "./components/calendar";
-import ParametersPanel from "./components/ParametersPanel";
+import MainView from "./views/MainView";
 import ThemeToggle from "./components/ThemeToggle";
 
 export default function App() {
-    const [selectedDate, setSelectedDate] = useState('');
     const [isDarkMode, setIsDarkMode] = useState(false);
 
     const toggleDarkMode = () => {
@@ -25,8 +23,7 @@ export default function App() {
             {/* Main Content Placeholder */}
             <main className={`main ${isDarkMode ? 'dark' : ''}`}>
                 <div className="panel-wrapper">
-                    <ParametersPanel selectedDate={selectedDate} />
-                    <CalendarExample onDateSelect={setSelectedDate} />
+                    <MainView/>
                 </div>
             </main>
 
