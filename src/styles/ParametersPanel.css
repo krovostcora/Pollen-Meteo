@@ -163,3 +163,64 @@
 .dark .checkbox-label{
     color: #E0E0E0;
 }
+.section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+.parameters-panel {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    width: 100%;
+    max-width: 1200px;
+    margin-bottom: 20px;
+}
+
+/* Кожен блок */
+.block {
+    background: var(--block-bg, #f9f9f9);
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Стилі для кнопок */
+.buttons-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.show-button, .reset-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    background-color: #4f46e5;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.show-button:hover, .reset-button:hover {
+    background-color: #4338ca;
+}
+
+/* Помилка */
+.error {
+    color: red;
+    margin-top: 10px;
+}
+
+/* Секція графіка */
+.graph-section {
+    width: 100%;
+    max-width: 1200px;
+    margin-top: 30px;
+}
+

@@ -63,31 +63,67 @@ const MainView = () => {
     return (
         <div className="section">
             <div className="parameters-panel">
-                <LocationSelector selectedCity={selectedCity} setSelectedCity={setSelectedCity} />
-                <SelectParams
-                    selectedCity={selectedCity}
-                    setSelectedCity={setSelectedCity}
-                    selectedGraph={selectedGraph}
-                    setSelectedGraph={setSelectedGraph}
-                    selectedParams={selectedParams}
-                    setSelectedParams={setSelectedParams}
-                />
+                {/* Ліва колонка: Локація + Календар */}
+                <div className="block">
+                    <LocationSelector selectedCity={selectedCity} setSelectedCity={setSelectedCity} />
+                    <CalendarExample onDateSelect={setSelectedDate} />
+                </div>
 
+                {/* Середня колонка: Morphotypes */}
+                <div className="block">
+                    <h3 className="section-title">Morphotypes</h3>
+                    <SelectParams
+                        selectedCity={selectedCity}
+                        setSelectedCity={setSelectedCity}
+                        selectedGraph={selectedGraph}
+                        setSelectedGraph={setSelectedGraph}
+                        selectedParams={selectedParams}
+                        setSelectedParams={setSelectedParams}
+                    />
+                </div>
+
+                {/* Права колонка: Weather та Graph Type */}
+                <div className="block">
+                    <h3 className="section-title">Meteorological Conditions</h3>
+                    {/* Сюди встав, якщо будеш робити погодні параметри */}
+
+                    <h3 className="section-title" style={{ marginTop: '20px' }}>Type of Graph</h3>
+                    {/* Якщо є окремий вибір типу графіку — встав сюди */}
+                </div>
+            </div>
+
+            <div className="buttons-container">
                 <button className="show-button" onClick={handleShowGraph}>
                     Show Graph
                 </button>
 
-                {error && <div className="error">{error}</div>}
+                <button
+                    className={`reset-button visible`}
+                    onClick={() => {
+                        setSelectedCity(null);
+                        setSelectedGraph('');
+                        setSelectedParams([]);
+                        setSelectedDate('');
+                        setWeatherData([]);
+                        setError('');
+                    }}
+                >
+                    Reset
+                </button>
+            </div>
 
+            {error && <div className="error">{error}</div>}
+
+            <div className="graph-section">
                 <WeatherGraph
                     weatherData={weatherData}
                     selectedGraph={selectedGraph}
                     selectedParams={selectedParams}
                 />
             </div>
-            <CalendarExample onDateSelect={setSelectedDate} />
-    </div>
+        </div>
     );
+
 };
 
 export default MainView;
