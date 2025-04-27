@@ -4,12 +4,13 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background-color: #ffffff;
+  color: #6B7280;
   color: #000;
 }
 
+
 .header {
-  background-color: #EFF1F5;
+  background-color: rgba(113, 178, 250, 0.6);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -21,10 +22,11 @@
   text-align: center;
   padding: 1rem;
   font-size: 0.875rem;
-  color: #6B7280; /* tailwind gray-500 */
+  background-color: rgba(113, 178, 250, 0.6);
 }
 
 .logo {
+  margin-left: 1rem;
   color: #000;
   font-family: 'Inter', sans-serif;
   font-size: 30px;

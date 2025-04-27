@@ -1,12 +1,11 @@
 import React from 'react';
 import '../styles/WeatherGraph.css';
-
 import {
     LineChart, Line,
     BarChart, Bar,
     ScatterChart, Scatter,
     XAxis, YAxis,
-    CartesianGrid, Tooltip, Legend
+    CartesianGrid, Tooltip, Legend, Brush
 } from 'recharts';
 
 const graphColors = {
@@ -33,6 +32,20 @@ const paramKeys = {
 const WeatherGraph = ({ weatherData, selectedGraph, selectedParams }) => {
     if (!weatherData.length || !selectedParams.length) return null;
 
+    // Визначаємо, як форматувати вісь X
+    const isShortRange = () => {
+        const dates = [...new Set(weatherData.map(d => d.time.slice(0, 10)))];
+        return dates.length <= 2;
+    };
+
+    const formatTick = (tick) => {
+        if (isShortRange()) {
+            return tick.slice(11, 16);
+        } else {
+            return tick.slice(5, 10);
+        }
+    };
+
     const renderChartContent = () => {
         return Object.entries(paramKeys)
             .filter(([label]) => selectedParams.includes(label))
@@ -55,9 +68,9 @@ const WeatherGraph = ({ weatherData, selectedGraph, selectedParams }) => {
     };
 
     const commonProps = {
-        width: 1000,
-        height: 500,
-        margin: { top: 5, right: 5, left: -40, bottom: 5 }
+        width: 1200,
+        height: 600,
+        margin: { top: 20, right: 30, left: 0, bottom: 30 },
     };
 
     const renderChart = () => {
@@ -66,33 +79,36 @@ const WeatherGraph = ({ weatherData, selectedGraph, selectedParams }) => {
                 return (
                     <LineChart data={weatherData} {...commonProps}>
                         <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-                        <XAxis dataKey="time" tickFormatter={(t) => t.slice(11, 16)} />
+                        <XAxis dataKey="time" tickFormatter={formatTick} />
                         <YAxis />
                         <Tooltip />
                         <Legend />
                         {renderChartContent()}
+                        <Brush dataKey="time" tickFormatter={formatTick} height={30} stroke="#8884d8" />
                     </LineChart>
                 );
             case 'bar':
                 return (
                     <BarChart data={weatherData} {...commonProps}>
                         <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-                        <XAxis dataKey="time" tickFormatter={(t) => t.slice(11, 16)} />
+                        <XAxis dataKey="time" tickFormatter={formatTick} />
                         <YAxis />
                         <Tooltip />
                         <Legend />
                         {renderChartContent()}
+                        <Brush dataKey="time" tickFormatter={formatTick} height={30} stroke="#8884d8" />
                     </BarChart>
                 );
             case 'scatter':
                 return (
                     <ScatterChart {...commonProps}>
                         <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-                        <XAxis dataKey="x" name="Time" tickFormatter={(t) => t.slice(11, 16)} />
+                        <XAxis dataKey="x" name="Time" tickFormatter={formatTick} />
                         <YAxis />
                         <Tooltip />
                         <Legend />
                         {renderChartContent()}
+                        <Brush dataKey="x" tickFormatter={formatTick} height={30} stroke="#8884d8" />
                     </ScatterChart>
                 );
             default:
@@ -100,7 +116,7 @@ const WeatherGraph = ({ weatherData, selectedGraph, selectedParams }) => {
         }
     };
 
-    return <>{renderChart()}</>;
+    return <div className="weather-graph">{renderChart()}</div>;
 };
 
 export default WeatherGraph;

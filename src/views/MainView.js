@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import SelectParams from '../components/SelectParams';
+import React, { useState } from 'react';
 import WeatherGraph from '../components/WeatherGraph';
-import '../styles/ParametersPanel.css';
-import CalendarExample from "../components/calendar";
-import LocationSelector from "../components/parameters/LocationSelector";
-
-
+import CalendarExample from '../components/calendar';
+import LocationSelector from '../components/parameters/LocationSelector';
+import MorphotypesSelector from '../components/parameters/MorphotypesSelector';
+import MeteorologicalConditionsSelector from '../components/parameters/MeteorologicalConditionsSelector';
+import GraphTypeSelector from '../components/parameters/GraphTypeSelector';
+import '../styles/MainView.css';
 
 const MainView = () => {
     const [selectedCity, setSelectedCity] = useState(null);
@@ -14,12 +14,7 @@ const MainView = () => {
     const [selectedGraph, setSelectedGraph] = useState('');
     const [weatherData, setWeatherData] = useState([]);
     const [error, setError] = useState('');
-
-    useEffect(() => {
-        if (selectedCity && selectedDate?.length === 2) {
-            handleShowGraph();
-        }
-    }, [selectedCity, selectedDate]);
+    const [isGraphVisible, setIsGraphVisible] = useState(false);
 
     const handleShowGraph = async () => {
         if (!selectedCity || !selectedDate?.length === 2) return;
@@ -37,58 +32,61 @@ const MainView = () => {
             const allWeatherData = [];
 
             for (const day of dates) {
-                const res = await fetch("http://localhost:3001/weather", {
+                const response = await fetch("http://localhost:3001/weather", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
                         stationCode: selectedCity.code,
                         date: day,
-                    })
+                    }),
                 });
-                if (res.ok) {
-                    const data = await res.json();
+
+                if (response.ok) {
+                    const data = await response.json();
                     allWeatherData.push(...data);
                 }
             }
 
             setWeatherData(allWeatherData);
             setError('');
+            setIsGraphVisible(true);
         } catch (err) {
             setError('Failed to load weather data');
             console.error(err);
         }
     };
 
+    const handleReset = () => {
+        setSelectedCity(null);
+        setSelectedGraph('');
+        setSelectedParams([]);
+        setSelectedDate('');
+        setWeatherData([]);
+        setError('');
+        setIsGraphVisible(false);
+    };
+
+    const isAnyFilterSelected = selectedCity || selectedGraph || selectedParams.length > 0 || selectedDate;
 
     return (
         <div className="section">
             <div className="parameters-panel">
-                {/* Ліва колонка: Локація + Календар */}
-                <div className="block">
+                <div className="block left-col">
+                    <h3 className="section-title">Location</h3>
                     <LocationSelector selectedCity={selectedCity} setSelectedCity={setSelectedCity} />
                     <CalendarExample onDateSelect={setSelectedDate} />
                 </div>
 
-                {/* Середня колонка: Morphotypes */}
-                <div className="block">
+                <div className="block middle-col">
                     <h3 className="section-title">Morphotypes</h3>
-                    <SelectParams
-                        selectedCity={selectedCity}
-                        setSelectedCity={setSelectedCity}
-                        selectedGraph={selectedGraph}
-                        setSelectedGraph={setSelectedGraph}
-                        selectedParams={selectedParams}
-                        setSelectedParams={setSelectedParams}
-                    />
+                    <MorphotypesSelector selectedParams={selectedParams} setSelectedParams={setSelectedParams} />
                 </div>
 
-                {/* Права колонка: Weather та Graph Type */}
-                <div className="block">
+                <div className="block right-col">
                     <h3 className="section-title">Meteorological Conditions</h3>
-                    {/* Сюди встав, якщо будеш робити погодні параметри */}
-
+                    <MeteorologicalConditionsSelector selectedParams={selectedParams} setSelectedParams={setSelectedParams} />
                     <h3 className="section-title" style={{ marginTop: '20px' }}>Type of Graph</h3>
-                    {/* Якщо є окремий вибір типу графіку — встав сюди */}
+                    <GraphTypeSelector selectedGraph={selectedGraph} setSelectedGraph={setSelectedGraph} />
                 </div>
             </div>
 
@@ -96,34 +94,26 @@ const MainView = () => {
                 <button className="show-button" onClick={handleShowGraph}>
                     Show Graph
                 </button>
-
-                <button
-                    className={`reset-button visible`}
-                    onClick={() => {
-                        setSelectedCity(null);
-                        setSelectedGraph('');
-                        setSelectedParams([]);
-                        setSelectedDate('');
-                        setWeatherData([]);
-                        setError('');
-                    }}
-                >
-                    Reset
-                </button>
+                {isAnyFilterSelected && (
+                    <button className="reset-button visible" onClick={handleReset}>
+                        Reset
+                    </button>
+                )}
             </div>
 
             {error && <div className="error">{error}</div>}
 
-            <div className="graph-section">
-                <WeatherGraph
-                    weatherData={weatherData}
-                    selectedGraph={selectedGraph}
-                    selectedParams={selectedParams}
-                />
-            </div>
+            {isGraphVisible && (
+                <div className="graph-section">
+                    <WeatherGraph
+                        weatherData={weatherData}
+                        selectedGraph={selectedGraph}
+                        selectedParams={selectedParams}
+                    />
+                </div>
+            )}
         </div>
     );
-
 };
 
 export default MainView;

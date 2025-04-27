@@ -6,10 +6,11 @@
 }
 
 .theme-toggle-label {
+    margin-right: 2rem;
     background-color: #111;
-    width: 50px;
-    height: 26px;
-    border-radius: 50px;
+    width: 100px;
+    height: 52px;
+    border-radius: 100px;
     position: relative;
     padding: 5px;
     cursor: pointer;
@@ -18,20 +19,20 @@
     align-items: center;
 }
 
-.fa-moon { color: #f1c40f; }
-.fa-sun { color: #f39c12; }
+.fa-moon { color: #f1c40f; margin-left: 8px; }
+.fa-sun { color: #ffb700; margin-right: 8px; }
 
 .theme-toggle-label .ball {
     background-color: #fff;
-    width: 22px;
-    height: 22px;
+    width: 44px;
+    height: 44px;
     position: absolute;
-    left: 2px;
-    top: 2px;
+    left: 4px;
+    top: 4px;
     border-radius: 50%;
     transition: transform 0.2s linear;
 }
 
 .theme-toggle-checkbox:checked + .theme-toggle-label .ball {
-    transform: translateX(24px);
+    transform: translateX(48px);
 }
