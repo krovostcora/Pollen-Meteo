@@ -4,7 +4,7 @@ import MeteorologicalConditionsSelector from './parameters/MeteorologicalConditi
 import GraphTypeSelector from './parameters/GraphTypeSelector';
 
 const SelectParams = ({ selectedCity, setSelectedCity, selectedGraph, setSelectedGraph, selectedParams, setSelectedParams }) => {
-    const [isDarkTheme, setIsDarkTheme] = useState(false);
+    const [setIsDarkTheme] = useState(false);
 
     useEffect(() => {
         const updateTheme = () => {

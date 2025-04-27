@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import '../styles/WeatherGraph.css';
 import {
     LineChart, Line,
@@ -7,6 +7,8 @@ import {
     XAxis, YAxis,
     CartesianGrid, Tooltip, Legend, Brush
 } from 'recharts';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 const graphColors = {
     temperature: '#8884d8',
@@ -30,9 +32,10 @@ const paramKeys = {
 };
 
 const WeatherGraph = ({ weatherData, selectedGraph, selectedParams }) => {
+    const graphRef = useRef();
+
     if (!weatherData.length || !selectedParams.length) return null;
 
-    // Визначаємо, як форматувати вісь X
     const isShortRange = () => {
         const dates = [...new Set(weatherData.map(d => d.time.slice(0, 10)))];
         return dates.length <= 2;
@@ -46,26 +49,63 @@ const WeatherGraph = ({ weatherData, selectedGraph, selectedParams }) => {
         }
     };
 
+    const handleDownloadPDF = async () => {
+        const canvas = await html2canvas(graphRef.current);
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF({
+            orientation: 'landscape',
+            unit: 'px',
+            format: [canvas.width, canvas.height]
+        });
+        pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+        pdf.save('weather-graph.pdf');
+    };
+
     const renderChartContent = () => {
         return Object.entries(paramKeys)
-            .filter(([label]) => selectedParams.includes(label))
+            .filter(([label]) => selectedParams.includes(label)) // тільки вибрані параметри
             .map(([label, key]) => {
                 const color = graphColors[key];
                 const name = paramLabels[key];
 
                 switch (selectedGraph) {
                     case 'line':
-                        return <Line key={key} type="monotone" dataKey={key} stroke={color} name={name} />;
+                        return (
+                            <Line
+                                key={key}
+                                type="monotone"
+                                dataKey={key}
+                                stroke={color}
+                                name={name}
+                                dot={false} // вимкнемо крапки для збереження
+                                isAnimationActive={false} // вимкнемо анімацію при збереженні
+                            />
+                        );
                     case 'bar':
-                        return <Bar key={key} dataKey={key} fill={color} name={name} />;
+                        return (
+                            <Bar
+                                key={key}
+                                dataKey={key}
+                                fill={color}
+                                name={name}
+                            />
+                        );
                     case 'scatter':
                         const formattedData = weatherData.map(d => ({ x: d.time, y: d[key] }));
-                        return <Scatter key={key} name={name} data={formattedData} fill={color} />;
+                        return (
+                            <Scatter
+                                key={key}
+                                name={name}
+                                data={formattedData}
+                                fill={color}
+                            />
+                        );
                     default:
                         return null;
                 }
             });
     };
+
 
     const commonProps = {
         width: 1200,
@@ -74,13 +114,18 @@ const WeatherGraph = ({ weatherData, selectedGraph, selectedParams }) => {
     };
 
     const renderChart = () => {
+        const axisStyle = {
+            stroke: 'var(--axis-color)',
+            tick: { fill: 'var(--axis-color)' },
+        };
+
         switch (selectedGraph) {
             case 'line':
                 return (
                     <LineChart data={weatherData} {...commonProps}>
                         <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-                        <XAxis dataKey="time" tickFormatter={formatTick} />
-                        <YAxis />
+                        <XAxis dataKey="time" tickFormatter={formatTick} {...axisStyle} />
+                        <YAxis {...axisStyle} />
                         <Tooltip />
                         <Legend />
                         {renderChartContent()}
@@ -91,8 +136,8 @@ const WeatherGraph = ({ weatherData, selectedGraph, selectedParams }) => {
                 return (
                     <BarChart data={weatherData} {...commonProps}>
                         <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-                        <XAxis dataKey="time" tickFormatter={formatTick} />
-                        <YAxis />
+                        <XAxis dataKey="time" tickFormatter={formatTick} {...axisStyle} />
+                        <YAxis {...axisStyle} />
                         <Tooltip />
                         <Legend />
                         {renderChartContent()}
@@ -103,8 +148,8 @@ const WeatherGraph = ({ weatherData, selectedGraph, selectedParams }) => {
                 return (
                     <ScatterChart {...commonProps}>
                         <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-                        <XAxis dataKey="x" name="Time" tickFormatter={formatTick} />
-                        <YAxis />
+                        <XAxis dataKey="x" name="Time" tickFormatter={formatTick} {...axisStyle} />
+                        <YAxis {...axisStyle} />
                         <Tooltip />
                         <Legend />
                         {renderChartContent()}
@@ -116,7 +161,14 @@ const WeatherGraph = ({ weatherData, selectedGraph, selectedParams }) => {
         }
     };
 
-    return <div className="weather-graph">{renderChart()}</div>;
+    return (
+        <div className="weather-graph">
+            <div ref={graphRef}>
+                {renderChart()}
+            </div>
+            <button className="download-button" onClick={handleDownloadPDF}>Download PDF</button>
+        </div>
+    );
 };
 
 export default WeatherGraph;
