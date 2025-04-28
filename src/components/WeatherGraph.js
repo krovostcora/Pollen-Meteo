@@ -63,7 +63,7 @@ const WeatherGraph = ({ weatherData, selectedGraph, selectedParams }) => {
 
     const renderChartContent = () => {
         return Object.entries(paramKeys)
-            .filter(([label]) => selectedParams.includes(label)) // тільки вибрані параметри
+            .filter(([label]) => selectedParams.includes(label))
             .map(([label, key]) => {
                 const color = graphColors[key];
                 const name = paramLabels[key];
@@ -162,13 +162,16 @@ const WeatherGraph = ({ weatherData, selectedGraph, selectedParams }) => {
     };
 
     return (
-        <div className="weather-graph">
-            <div ref={graphRef}>
+        <div className="weather-graph-container">
+            <div className="weather-graph" ref={graphRef}>
                 {renderChart()}
             </div>
-            <button className="download-button" onClick={handleDownloadPDF}>Download PDF</button>
+            <button className="download-button" onClick={handleDownloadPDF}>
+                Download PDF
+            </button>
         </div>
     );
+
 };
 
 export default WeatherGraph;

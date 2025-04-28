@@ -15,16 +15,18 @@
     position: relative;
     z-index: 1;
     background-color: white;
+    padding: 20px;
 }
 
+
 .download-button {
-    margin-top: 20px;
+    margin-top: 10px;
     padding: 12px 24px;
-    background: linear-gradient(90deg, #4f93ce, #28527a);
+    background: linear-gradient(90deg, #4fce73, #287a29);
     color: white;
     border: none;
     border-radius: 10px;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: bold;
     cursor: pointer;
     transition: background 0.3s ease;
