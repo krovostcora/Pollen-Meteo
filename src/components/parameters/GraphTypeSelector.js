@@ -1,12 +1,15 @@
 import React from 'react';
-
-const graphTypes = [
-    { value: "line", label: "Line graph" },
-    { value: "bar", label: "Bar chart" },
-    { value: "scatter", label: "Scatter plot" },
-];
+import { useTranslation } from 'react-i18next';
 
 const GraphTypeSelector = ({ selectedGraph, setSelectedGraph }) => {
+    const { t } = useTranslation();
+
+    const graphTypes = [
+        { value: "line", label: t('lineGraph') },
+        { value: "bar", label: t('barChart') },
+        { value: "scatter", label: t('scatterPlot') },
+    ];
+
     return (
         <div className="block-1">
             {graphTypes.map((graph) => (

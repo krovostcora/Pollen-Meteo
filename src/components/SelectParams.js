@@ -1,7 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import MorphotypesSelector from './parameters/MorphotypesSelector';
-import MeteorologicalConditionsSelector from './parameters/MeteorologicalConditionsSelector';
-import GraphTypeSelector from './parameters/GraphTypeSelector';
 
 const SelectParams = ({ selectedCity, setSelectedCity, selectedGraph, setSelectedGraph, selectedParams, setSelectedParams }) => {
     const [setIsDarkTheme] = useState(false);

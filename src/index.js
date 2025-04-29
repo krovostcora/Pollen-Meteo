@@ -9,6 +9,7 @@ import '@mantine/core/styles.css';
 import '@mantine/dates/styles.css';
 
 import 'dayjs/locale/en';
+import './i18n';
 import dayjs from 'dayjs';
 dayjs.locale('en');
 

@@ -1,0 +1,31 @@
+.language-switcher {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 20px;
+    padding-right: 2rem;
+}
+.language-select {
+    padding: 8px 12px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background-color: white;
+    cursor: pointer;
+    appearance: none;
+    font-family: system-ui, sans-serif;
+}
+
+.language-select:hover {
+    background-color: #f5f5f5;
+}
+
+.dark .language-select {
+    background-color: #616165;
+    color: #fff;
+    border: 1px solid #555;
+}
+
+.dark .language-select:hover {
+    background-color: #3A3A3A;
+}

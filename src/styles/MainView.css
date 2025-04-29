@@ -129,14 +129,15 @@
 
 .buttons-container {
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
     gap: 20px;
     margin: 20px 0;
+    position: relative;
 }
 
-.show-button,
-.reset-button {
+.show-button {
+    height: fit-content;
     padding: 10px 20px;
     border: none;
     border-radius: 8px;
@@ -147,17 +148,25 @@
     transition: background-color 0.3s ease;
 }
 
-.show-button:hover,
-.reset-button:hover {
-    background-color: rgba(20, 78, 140, 0.6);
+.reset-button {
+    position: fixed;
+    margin-right: 40px;
+    right: 0;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    background-color: rgba(255, 47, 0, 0.56);
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
-.reset-button {
-    margin-top: 10px;
-    opacity: 0;
-    transform: scale(0.95);
-    transition: opacity 0.3s ease, transform 0.3s ease, background-color 0.3s ease;
-    display: inline-block;
+.show-button:hover{
+    background-color: rgba(20, 78, 140, 0.6);
+}
+ .reset-button:hover {
+     background-color: rgba(138, 27, 1, 0.56);
 }
 
 .reset-button.visible {
@@ -231,13 +240,11 @@
     color: #e0e0e0;
 }
 
-.dark .show-button,
-.dark .reset-button {
+.dark .show-button{
     background-color: rgba(0, 122, 255, 0.6);
 }
 
-.dark .show-button:hover,
-.dark .reset-button:hover {
+.dark .show-button:hover{
     background-color: rgba(20, 78, 140, 0.6);
 }
 .dark .block-select-location {

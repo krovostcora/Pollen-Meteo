@@ -6,6 +6,7 @@ import MorphotypesSelector from '../components/parameters/MorphotypesSelector';
 import MeteorologicalConditionsSelector from '../components/parameters/MeteorologicalConditionsSelector';
 import GraphTypeSelector from '../components/parameters/GraphTypeSelector';
 import '../styles/MainView.css';
+import { useTranslation } from 'react-i18next';
 
 const MainView = () => {
     const [selectedCity, setSelectedCity] = useState(null);
@@ -15,6 +16,7 @@ const MainView = () => {
     const [weatherData, setWeatherData] = useState([]);
     const [error, setError] = useState('');
     const [isGraphVisible, setIsGraphVisible] = useState(false);
+    const { t } = useTranslation();
 
     const handleShowGraph = async () => {
         if (!selectedCity || !selectedDate?.length === 2) return;
@@ -72,34 +74,39 @@ const MainView = () => {
         <div className="section">
             <div className="parameters-panel">
                 <div className="block left-col">
-                    <h3 className="section-title">Location</h3>
+                    <h3 className="section-title">{t('location')}</h3>
                     <LocationSelector selectedCity={selectedCity} setSelectedCity={setSelectedCity} />
                     <CalendarExample onDateSelect={setSelectedDate} />
                 </div>
 
                 <div className="block middle-col">
-                    <h3 className="section-title">Morphotypes</h3>
+                    <h3 className="section-title">{t('morphotypes')}</h3>
                     <MorphotypesSelector selectedParams={selectedParams} setSelectedParams={setSelectedParams} />
                 </div>
 
                 <div className="block right-col">
-                    <h3 className="section-title">Meteorological Conditions</h3>
+                    <h3 className="section-title">{t('meteorologicalConditions')}</h3>
                     <MeteorologicalConditionsSelector selectedParams={selectedParams} setSelectedParams={setSelectedParams} />
-                    <h3 className="section-title" style={{ marginTop: '20px' }}>Type of Graph</h3>
+                    <h3 className="section-title" style={{ marginTop: '20px' }}> {t('typeOfGraph')}</h3>
                     <GraphTypeSelector selectedGraph={selectedGraph} setSelectedGraph={setSelectedGraph} />
                 </div>
             </div>
 
             <div className="buttons-container">
-                <button className="show-button" onClick={handleShowGraph}>
-                    Show Graph
-                </button>
-                {isAnyFilterSelected && (
-                    <button className="reset-button visible" onClick={handleReset}>
-                        Reset
+                <div className="button-wrapper">
+                    <button className="show-button" onClick={handleShowGraph}>
+                        {t('showGraph')}
                     </button>
-                )}
+                </div>
+                <div className="button-wrapper">
+                    {isAnyFilterSelected && (
+                        <button className="reset-button visible" onClick={handleReset}>
+                            {t('reset')}
+                        </button>
+                    )}
+                </div>
             </div>
+
 
             {error && <div className="error">{error}</div>}
 

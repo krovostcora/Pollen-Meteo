@@ -1,39 +1,41 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
-const weatherParametersOptions = [
-    { value: "Temperature", label: "Temperature" },
-    { value: "Humidity", label: "Humidity" },
-    { value: "Precipitation", label: "Precipitation" },
-    { value: "Wind direction", label: "Wind direction" },
-    { value: "Wind speed", label: "Wind speed" },
-];
+const WeatherParametersCheckboxes = ({ selectedParams, setSelectedParams }) => {
+    const { t } = useTranslation();
 
-const MeteorologicalConditionsSelector = ({ selectedParams, setSelectedParams }) => {
-    const handleCheckboxChange = (param) => {
-        setSelectedParams((prev) =>
-            prev.includes(param)
-                ? prev.filter((p) => p !== param)
-                : [...prev, param]
-        );
+    const weatherParametersOptions = [
+        { value: "Temperature", label: t('temperature') },
+        { value: "Humidity", label: t('humidity') },
+        { value: "Precipitation", label: t('precipitation') },
+        { value: "Wind direction", label: t('windDirection') },
+        { value: "Wind speed", label: t('windSpeed') },
+    ];
+
+    const handleChange = (value) => {
+        if (selectedParams.includes(value)) {
+            setSelectedParams(selectedParams.filter((v) => v !== value));
+        } else {
+            setSelectedParams([...selectedParams, value]);
+        }
     };
 
     return (
-        <div className="block-1">
-            <div className="checkbox-list">
-                {weatherParametersOptions.map((cond) => (
-                    <label key={cond.value} className="checkbox-label">
-                        <input
-                            type="checkbox"
-                            className="checkbox"
-                            checked={selectedParams.includes(cond.value)}
-                            onChange={() => handleCheckboxChange(cond.value)}
-                        />
-                        {cond.label}
-                    </label>
-                ))}
-            </div>
+        <div className="checkbox-list">
+            {weatherParametersOptions.map((param) => (
+                <label key={param.value} className="checkbox-label">
+                    <input
+                        type="checkbox"
+                        value={param.value}
+                        checked={selectedParams.includes(param.value)}
+                        onChange={() => handleChange(param.value)}
+                        className="checkbox-input"
+                    />
+                    {param.label}
+                </label>
+            ))}
         </div>
     );
 };
 
-export default MeteorologicalConditionsSelector;
+export default WeatherParametersCheckboxes;

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "./App.css";
 import MainView from "./views/MainView";
 import ThemeToggle from "./components/ThemeToggle";
+import LanguageSwitcher from "./components/LanguageSwitcher";
 
 export default function App() {
     const [isDarkMode, setIsDarkMode] = useState(false);
@@ -17,13 +18,16 @@ export default function App() {
                 <div className="logo">
                     Pollen<br />&<br />Meteo
                 </div>
-                <ThemeToggle isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
+                <div className="header-controls">
+                    <LanguageSwitcher />
+                    <ThemeToggle isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
+                </div>
             </header>
 
-            {/* Main Content Placeholder */}
+            {/* Main */}
             <main className={`main ${isDarkMode ? 'dark' : ''}`}>
                 <div className="panel-wrapper">
-                    <MainView/>
+                    <MainView />
                 </div>
             </main>
 
