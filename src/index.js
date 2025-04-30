@@ -11,7 +11,12 @@ import '@mantine/dates/styles.css';
 import 'dayjs/locale/en';
 import './i18n';
 import dayjs from 'dayjs';
+import 'dayjs/locale/en';
+import 'dayjs/locale/lt';
+import 'dayjs/locale/uk';
+
 dayjs.locale('en');
+
 
 ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
