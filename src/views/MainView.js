@@ -23,10 +23,20 @@ const MainView = () => {
 
         const [startDate, endDate] = selectedDate;
         const dates = [];
-        let date = new Date(startDate);
 
-        while (date <= endDate) {
-            dates.push(new Date(date).toISOString().split('T')[0]);
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+
+        // add 2 days to start and end dates
+        start.setDate(start.getDate() + 2);
+        end.setDate(start.getDate() + 2);
+
+        start.setHours(0, 0, 0, 0);
+        end.setHours(23, 59, 59, 999);
+
+        let date = new Date(start);
+        while (date <= end) {
+            dates.push(date.toISOString().slice(0, 10));
             date.setDate(date.getDate() + 1);
         }
 
@@ -57,6 +67,9 @@ const MainView = () => {
             console.error(err);
         }
     };
+
+
+
 
     const handleReset = () => {
         setSelectedCity(null);
