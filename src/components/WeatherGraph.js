@@ -30,6 +30,30 @@ const paramKeys = {
     "Precipitation": "precipitation",
     "Wind speed": "wind_speed",
 };
+const CustomTooltip = ({ active, payload, label }) => {
+    if (!active || !payload || !payload.length) return null;
+
+    return (
+        <div style={{
+            backgroundColor: 'white',
+            border: '1px solid #ccc',
+            padding: '10px',
+        }}>
+            <p style={{ margin: 0, color: 'black', fontWeight: 'bold' }}>{label}</p>
+            {payload.map((entry, index) => (
+                <p
+                    key={index}
+                    style={{
+                        margin: 0,
+                        color: entry.color,
+                    }}
+                >
+                    {entry.name}: {entry.value}
+                </p>
+            ))}
+        </div>
+    );
+};
 
 const WeatherGraph = ({ weatherData, selectedGraph, selectedParams }) => {
     const graphRef = useRef();
@@ -126,7 +150,7 @@ const WeatherGraph = ({ weatherData, selectedGraph, selectedParams }) => {
                         <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
                         <XAxis dataKey="time" tickFormatter={formatTick} {...axisStyle} />
                         <YAxis {...axisStyle} />
-                        <Tooltip />
+                        <Tooltip content={<CustomTooltip />} />
                         <Legend />
                         {renderChartContent()}
                         <Brush dataKey="time" tickFormatter={formatTick} height={30} stroke="#8884d8" />
@@ -138,7 +162,7 @@ const WeatherGraph = ({ weatherData, selectedGraph, selectedParams }) => {
                         <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
                         <XAxis dataKey="time" tickFormatter={formatTick} {...axisStyle} />
                         <YAxis {...axisStyle} />
-                        <Tooltip />
+                        <Tooltip content={<CustomTooltip />} />
                         <Legend />
                         {renderChartContent()}
                         <Brush dataKey="time" tickFormatter={formatTick} height={30} stroke="#8884d8" />
@@ -150,7 +174,7 @@ const WeatherGraph = ({ weatherData, selectedGraph, selectedParams }) => {
                         <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
                         <XAxis dataKey="x" name="Time" tickFormatter={formatTick} {...axisStyle} />
                         <YAxis {...axisStyle} />
-                        <Tooltip />
+                        <Tooltip content={<CustomTooltip />} />
                         <Legend />
                         {renderChartContent()}
                         <Brush dataKey="x" tickFormatter={formatTick} height={30} stroke="#8884d8" />
