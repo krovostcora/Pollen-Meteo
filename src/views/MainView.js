@@ -29,7 +29,7 @@ const MainView = () => {
 
         // add 2 days to start and end dates
         start.setDate(start.getDate() + 2);
-        end.setDate(start.getDate() + 2);
+        end.setDate(end.getDate() + 2);
 
         start.setHours(0, 0, 0, 0);
         end.setHours(23, 59, 59, 999);
