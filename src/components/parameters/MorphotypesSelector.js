@@ -9,6 +9,15 @@ const morphotypesOptions = [
     { value: "Quercus", label: "Quercus" },
     { value: "Pinus", label: "Pinus" },
     { value: "Poaceae", label: "Poaceae" },
+    { value: "Festuca", label: "Festuca" },
+    { value: "Salix alba", label: "Salix alba" },
+    { value: "Salix fragilis", label: "Salix fragilis" },
+    { value: "Populus", label: "Populus" },
+    { value: "Acer negundo", label: "Acer negundo" },
+    { value: "Acer pseudoplatanus", label: "Acer pseudoplatanus" },
+    { value: "Juniperus", label: "Juniperus" },
+    { value: "Pinus sylvestris", label: "Pinus sylvestris" },
+    { value: "Pinus mugo", label: "Pinus mugo" }
 ];
 
 const MorphotypesSelector = ({ selectedParams, setSelectedParams }) => {
