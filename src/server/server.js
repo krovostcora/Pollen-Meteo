@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const pollenRouter = require('./pollen');
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
 const app = express();
@@ -7,6 +8,7 @@ const PORT = 3001;
 
 app.use(cors());
 app.use(express.json());
+app.use('/', pollenRouter);
 
 app.post('/weather', async (req, res) => {
     const { stationCode, date } = req.body;

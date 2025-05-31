@@ -1,135 +1,122 @@
 import React, { useRef } from 'react';
-import '../styles/WeatherGraph.css';
 import {
-    LineChart, Line,
-    BarChart, Bar,
-    ScatterChart, Scatter,
-    XAxis, YAxis,
-    CartesianGrid, Tooltip, Legend, Brush
+    LineChart, Line, BarChart, Bar, ScatterChart, Scatter,
+    CartesianGrid, XAxis, YAxis, Tooltip, Legend, Brush
 } from 'recharts';
-import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
-const graphColors = {
-    temperature: '#8884d8',
-    humidity: '#82ca9d',
-    precipitation: '#ff7300',
-    wind_speed: '#387908',
+// Mapping for morphotype display names to codes
+const morphotypeNameToCode = {
+    Alnus: "ALNU",
+    Artemisia: "ARTE",
+    Ambrosia: "AMBR",
+    Corylus: "CORY",
+    Betula: "BETU",
+    Quercus: "QUER",
+    Pinus: "PINA",
+    Poaceae: "POAC",
+    Salix: "SALI",
+    Populus: "POPU",
+    Acer: "ACER"
 };
 
-const paramLabels = {
-    temperature: 'Temperature (°C)',
-    humidity: 'Humidity (%)',
-    precipitation: 'Precipitation (mm)',
-    wind_speed: 'Wind speed (km/h)',
-};
-
+// Weather parameter display names to DB keys
 const paramKeys = {
     "Temperature": "temperature",
     "Humidity": "humidity",
     "Precipitation": "precipitation",
     "Wind speed": "wind_speed",
+    "Wind direction": "wind_direction"
 };
-const CustomTooltip = ({ active, payload, label }) => {
-    if (!active || !payload || !payload.length) return null;
 
-    return (
-        <div style={{
-            backgroundColor: 'white',
-            border: '1px solid #ccc',
-            padding: '10px',
-        }}>
-            <p style={{ margin: 0, color: 'black', fontWeight: 'bold' }}>{label}</p>
-            {payload.map((entry, index) => (
-                <p
-                    key={index}
-                    style={{
-                        margin: 0,
-                        color: entry.color,
-                    }}
-                >
-                    {entry.name}: {entry.value}
-                </p>
-            ))}
-        </div>
-    );
+// Color palette for lines/bars
+const COLORS = [
+    "#8884d8", "#82ca9d", "#ffc658", "#ff7300", "#0088FE",
+    "#00C49F", "#FFBB28", "#FF8042", "#A28FD0", "#FF6699"
+];
+
+// Format tick for X axis
+function formatTick(tick) {
+    if (!tick) return '';
+    // Try to format as date
+    const d = new Date(tick);
+    if (!isNaN(d)) {
+        return d.toISOString().slice(0, 10);
+    }
+    return tick;
+}
+
+// Custom tooltip
+const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+        return (
+            <div className="custom-tooltip" style={{ background: "#fff", border: "1px solid #ccc", padding: 10 }}>
+                <p>{formatTick(label)}</p>
+                {payload.map((entry, i) => (
+                    <p key={i} style={{ color: entry.color }}>
+                        {entry.name}: {entry.value}
+                    </p>
+                ))}
+            </div>
+        );
+    }
+    return null;
 };
 
 const WeatherGraph = ({ weatherData, selectedGraph, selectedParams }) => {
     const graphRef = useRef();
 
-    if (!weatherData.length || !selectedParams.length) return null;
-
-    const isShortRange = () => {
-        const dates = [...new Set(weatherData.map(d => d.time.slice(0, 10)))];
-        return dates.length <= 2;
-    };
-
-    const formatTick = (tick) => {
-        if (isShortRange()) {
-            return tick.slice(11, 16);
-        } else {
-            return tick.slice(5, 10);
+    // Map selectedParams to data keys and display names
+    const paramList = selectedParams.map((name) => {
+        if (morphotypeNameToCode[name]) {
+            return { key: morphotypeNameToCode[name], name };
         }
-    };
+        if (paramKeys[name]) {
+            return { key: paramKeys[name], name };
+        }
+        return null;
+    }).filter(Boolean);
 
-    const handleDownloadPDF = async () => {
-        const canvas = await html2canvas(graphRef.current);
-        const imgData = canvas.toDataURL('image/png');
-        const pdf = new jsPDF({
-            orientation: 'landscape',
-            unit: 'px',
-            format: [canvas.width, canvas.height]
-        });
-        pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
-        pdf.save('weather-graph.pdf');
-    };
-
-    const renderChartContent = () => {
-        return Object.entries(paramKeys)
-            .filter(([label]) => selectedParams.includes(label))
-            .map(([label, key]) => {
-                const color = graphColors[key];
-                const name = paramLabels[key];
-
-                switch (selectedGraph) {
-                    case 'line':
-                        return (
-                            <Line
-                                key={key}
-                                type="monotone"
-                                dataKey={key}
-                                stroke={color}
-                                name={name}
-                                dot={false} // вимкнемо крапки для збереження
-                                isAnimationActive={false} // вимкнемо анімацію при збереженні
-                            />
-                        );
-                    case 'bar':
-                        return (
-                            <Bar
-                                key={key}
-                                dataKey={key}
-                                fill={color}
-                                name={name}
-                            />
-                        );
-                    case 'scatter':
-                        const formattedData = weatherData.map(d => ({ x: d.time, y: d[key] }));
-                        return (
-                            <Scatter
-                                key={key}
-                                name={name}
-                                data={formattedData}
-                                fill={color}
-                            />
-                        );
-                    default:
-                        return null;
-                }
-            });
-    };
-
+    // Render chart content (lines, bars, scatters)
+    const renderChartContent = () => paramList.map(({ key, name }, idx) => {
+        const color = COLORS[idx % COLORS.length];
+        switch (selectedGraph) {
+            case 'line':
+                return (
+                    <Line
+                        key={key}
+                        type="monotone"
+                        dataKey={key}
+                        stroke={color}
+                        name={name}
+                        dot={false}
+                        isAnimationActive={false}
+                    />
+                );
+            case 'bar':
+                return (
+                    <Bar
+                        key={key}
+                        dataKey={key}
+                        fill={color}
+                        name={name}
+                    />
+                );
+            case 'scatter':
+                const formattedData = weatherData.map(d => ({ x: d.time, y: d[key] }));
+                return (
+                    <Scatter
+                        key={key}
+                        name={name}
+                        data={formattedData}
+                        fill={color}
+                    />
+                );
+            default:
+                return null;
+        }
+    });
 
     const commonProps = {
         width: 1200,
@@ -137,12 +124,13 @@ const WeatherGraph = ({ weatherData, selectedGraph, selectedParams }) => {
         margin: { top: 20, right: 30, left: 0, bottom: 30 },
     };
 
-    const renderChart = () => {
-        const axisStyle = {
-            stroke: 'var(--axis-color)',
-            tick: { fill: 'var(--axis-color)' },
-        };
+    const axisStyle = {
+        stroke: 'var(--axis-color)',
+        tick: { fill: 'var(--axis-color)' },
+    };
 
+    // Render the appropriate chart
+    const renderChart = () => {
         switch (selectedGraph) {
             case 'line':
                 return (
@@ -185,6 +173,20 @@ const WeatherGraph = ({ weatherData, selectedGraph, selectedParams }) => {
         }
     };
 
+    // Download as PDF
+    const handleDownloadPDF = async () => {
+        if (!graphRef.current) return;
+        const canvas = await html2canvas(graphRef.current);
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF({
+            orientation: "landscape",
+            unit: "px",
+            format: [canvas.width, canvas.height]
+        });
+        pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+        pdf.save('weather-graph.pdf');
+    };
+
     return (
         <div className="weather-graph-container">
             <div className="weather-graph" ref={graphRef}>
@@ -195,7 +197,6 @@ const WeatherGraph = ({ weatherData, selectedGraph, selectedParams }) => {
             </button>
         </div>
     );
-
 };
 
 export default WeatherGraph;
