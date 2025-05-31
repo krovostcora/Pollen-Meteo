@@ -1,5 +1,6 @@
-import React from 'react';
+import React from "react";
 
+// Only include morphotypes present in DB
 const morphotypesOptions = [
     { value: "Alnus", label: "Alnus" },
     { value: "Artemisia", label: "Artemisia" },
@@ -9,15 +10,9 @@ const morphotypesOptions = [
     { value: "Quercus", label: "Quercus" },
     { value: "Pinus", label: "Pinus" },
     { value: "Poaceae", label: "Poaceae" },
-    { value: "Festuca", label: "Festuca" },
-    { value: "Salix alba", label: "Salix alba" },
-    { value: "Salix fragilis", label: "Salix fragilis" },
+    { value: "Salix", label: "Salix" },
     { value: "Populus", label: "Populus" },
-    { value: "Acer negundo", label: "Acer negundo" },
-    { value: "Acer pseudoplatanus", label: "Acer pseudoplatanus" },
-    { value: "Juniperus", label: "Juniperus" },
-    { value: "Pinus sylvestris", label: "Pinus sylvestris" },
-    { value: "Pinus mugo", label: "Pinus mugo" }
+    { value: "Acer", label: "Acer" }
 ];
 
 const MorphotypesSelector = ({ selectedParams, setSelectedParams }) => {
@@ -30,21 +25,19 @@ const MorphotypesSelector = ({ selectedParams, setSelectedParams }) => {
     };
 
     return (
-
-            <div className="checkbox-list">
-                {morphotypesOptions.map((type) => (
-                    <label key={type.value} className="checkbox-label">
-                        <input
-                            type="checkbox"
-                            className="checkbox"
-                            checked={selectedParams.includes(type.value)}
-                            onChange={() => handleCheckboxChange(type.value)}
-                        />
-                        {type.label}
-                    </label>
-                ))}
-            </div>
-
+        <div className="checkbox-list">
+            {morphotypesOptions.map((type) => (
+                <label key={type.value} className="checkbox-label">
+                    <input
+                        type="checkbox"
+                        className="checkbox"
+                        checked={selectedParams.includes(type.value)}
+                        onChange={() => handleCheckboxChange(type.value)}
+                    />
+                    {type.label}
+                </label>
+            ))}
+        </div>
     );
 };
 

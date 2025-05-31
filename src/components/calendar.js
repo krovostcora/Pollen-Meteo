@@ -1,74 +1,86 @@
-import React, {useEffect, useState} from 'react';
-import { DatePicker } from '@mantine/dates';
+import React, { useEffect, useState } from 'react';
+import { DatePicker, DatesProvider } from '@mantine/dates';
 import '../styles/Calendar.css';
 import { useTranslation } from 'react-i18next';
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+import 'dayjs/locale/lt';
+import 'dayjs/locale/en';
+import 'dayjs/locale/uk';
 
-function CalendarExample({ onDateSelect }) {
-    // Initialize state with an array of two elements or null
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+const localeMap = {
+    en: 'en',
+    ua: 'uk',
+    lt: 'lt',
+};
+
+function CalendarExample({ onDateSelect, selectedDate }) {
     const [value, setValue] = useState([null, null]);
-    const { t } = useTranslation();
-    const { i18n } = useTranslation();
-
-    const localeMap = {
-        en: 'en-US',
-        ua: 'uk-UK',
-        lt: 'lt-LT',
-    };
-
-
+    const { t, i18n } = useTranslation();
 
     useEffect(() => {
         if (value[0] && value[1]) {
-            onDateSelect(value); // [start, end]
+            onDateSelect(value);
         }
     }, [value, onDateSelect]);
+
     useEffect(() => {
-        dayjs.locale(i18n.language);
+        dayjs.locale(localeMap[i18n.language] || 'en');
     }, [i18n.language]);
 
+    // Sync with parent if needed
+    useEffect(() => {
+        if (
+            selectedDate &&
+            Array.isArray(selectedDate) &&
+            (selectedDate[0] !== value[0] || selectedDate[1] !== value[1])
+        ) {
+            setValue(selectedDate);
+        }
+    }, [selectedDate]);
+
+    const handleChange = (range) => {
+        setValue(range); // Do NOT add +1 day here
+    };
 
     return (
-
         <div className="calendar-container">
-            {/* Always visible selected range */}
             <div className="selected-range">
                 <div className="date-column">
                     <span className="label">{t('start')}</span>
                     <span className="date">
-            {value[0]
-                ? value[0].toLocaleDateString(localeMap[i18n.language], {
-                    weekday: 'short',
-                    month: 'short',
-                    day: 'numeric',
-                    year: 'numeric',
-                })
-                : <span className="placeholder">{t('notSelected')}</span>}
-          </span>
+                        {value[0]
+                            ? dayjs(value[0]).format('ddd, MMM D, YYYY')
+                            : <span className="placeholder">{t('notSelected')}</span>}
+                    </span>
                 </div>
                 <div className="date-column">
                     <span className="label">{t('end')}</span>
                     <span className="date">
-            {value[1]
-                ? value[1].toLocaleDateString(localeMap[i18n.language], {
-                    weekday: 'short',
-                    month: 'short',
-                    day: 'numeric',
-                    year: 'numeric',
-                })
-                : <span className="placeholder">{t('notSelected')}</span>}
-          </span>
+                        {value[1]
+                            ? dayjs(value[1]).format('ddd, MMM D, YYYY')
+                            : <span className="placeholder">{t('notSelected')}</span>}
+                    </span>
                 </div>
             </div>
-
-            <DatePicker
-                className="custom-datepicker"
-                type="range"
-                value={value}
-                onChange={setValue}
-                locale={i18n.language}
-            />
-
+            <DatesProvider settings={{
+                timezone: 'Europe/Vilnius',
+                locale: localeMap[i18n.language] || 'en',
+                firstDayOfWeek: 1,
+                weekendDays: [0, 6]
+            }}>
+                <DatePicker
+                    className="custom-datepicker"
+                    type="range"
+                    value={value}
+                    onChange={handleChange}
+                    locale={localeMap[i18n.language] || 'en'}
+                />
+            </DatesProvider>
         </div>
     );
 }

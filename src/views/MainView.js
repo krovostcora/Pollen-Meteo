@@ -7,6 +7,7 @@ import MeteorologicalConditionsSelector from '../components/parameters/Meteorolo
 import GraphTypeSelector from '../components/parameters/GraphTypeSelector';
 import '../styles/MainView.css';
 import { useTranslation } from 'react-i18next';
+import dayjs from "dayjs";
 
 const paramKeys = {
     "Temperature": "temperature",
@@ -14,6 +15,12 @@ const paramKeys = {
     "Precipitation": "precipitation",
     "Wind speed": "wind_speed",
     "Wind direction": "wind_direction"
+};
+
+const cityLabelToBackend = {
+    'Vilnius': 'Vilnius',
+    'Šiauliai': 'Siauliai',
+    'Klaipėda': 'Klaipeda'
 };
 
 const morphotypeNameToCode = {
@@ -36,11 +43,9 @@ const pollenDateFieldMap = {
     Klaipeda: "LTKLAI"
 };
 
-// Helper to add days to a YYYY-MM-DD string
-function addDays(dateStr, days) {
-    const d = new Date(dateStr);
-    d.setDate(d.getDate() + days);
-    return d.toISOString().slice(0, 10);
+function formatDate(date) {
+    if (typeof date === 'string') return date.slice(0, 10);
+    return date.toISOString().slice(0, 10);
 }
 
 const MainView = () => {
@@ -54,6 +59,12 @@ const MainView = () => {
     const [loading, setLoading] = useState(false);
     const { t } = useTranslation();
 
+    // Log calendar selection
+    const handleCalendarSelect = (dateRange) => {
+        console.log('[Calendar] User selected date range:', dateRange);
+        setSelectedDate(dateRange);
+    };
+
     const handleShowGraph = async () => {
         if (!selectedCity || !selectedDate || selectedDate.length !== 2) {
             setError('Please select city and date range');
@@ -64,18 +75,23 @@ const MainView = () => {
         setIsGraphVisible(false);
 
         try {
-            const [startDate, endDate] = selectedDate;
-            // Adjust dates for API requests
-            const pollenStartDate = addDays(startDate, -1);
-            const pollenEndDate = addDays(endDate, 1);
+            const [userStartDate, userEndDate] = selectedDate || [];
+            const startStr = userStartDate ? dayjs(userStartDate).format('YYYY-MM-DD') : '';
+            const endStr = userEndDate ? dayjs(userEndDate).format('YYYY-MM-DD') : '';
 
-            // Prepare date strings for weather fetch
+            console.log('[ShowGraph] User selected city:', selectedCity);
+            console.log('[ShowGraph] User selected start date:', startStr);
+            console.log('[ShowGraph] User selected end date:', endStr);
+
+            // Prepare date strings for weather fetch (inclusive)
             const dates = [];
-            let current = pollenStartDate;
-            while (current <= pollenEndDate) {
-                dates.push(current);
-                current = addDays(current, 1);
+            let current = new Date(startStr);
+            const end = new Date(endStr);
+            while (current <= end) {
+                dates.push(current.toISOString().slice(0, 10));
+                current.setDate(current.getDate() + 1);
             }
+            console.log('[ShowGraph] Dates to fetch weather for:', dates);
 
             // Fetch weather data
             const allWeatherData = [];
@@ -93,12 +109,23 @@ const MainView = () => {
                     allWeatherData.push(...data);
                 }
             }
+            console.log('[ShowGraph] Weather data:', allWeatherData);
 
             // Prepare morphotype codes for pollen fetch
             const morphotypes = selectedParams
                 .filter(p => !Object.values(paramKeys).includes(p) && !paramKeys[p])
                 .map(name => morphotypeNameToCode[name])
                 .filter(Boolean);
+
+            // Always use backend city name for pollen request and field lookup
+            const backendCity = cityLabelToBackend[selectedCity.label];
+            const pollenDateField = pollenDateFieldMap[backendCity];
+            if (!pollenDateField) {
+                console.error('Invalid city label:', selectedCity.label, 'Backend city:', backendCity);
+                setError('Invalid city selection');
+                setLoading(false);
+                return;
+            }
 
             // Fetch pollen data if morphotypes are selected
             let pollenData = [];
@@ -107,22 +134,17 @@ const MainView = () => {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        stationName: selectedCity.label,
-                        startDate: pollenStartDate,
-                        endDate: pollenEndDate,
+                        stationName: backendCity,
+                        startDate: startStr,
+                        endDate: endStr,
                         morphotypes: morphotypes,
                     }),
                 });
                 pollenData = pollenResponse.ok ? await pollenResponse.json() : [];
             }
+            console.log('[ShowGraph] Pollen data:', pollenData);
 
             // Merge pollen data into weather data using correct date field
-            const pollenDateField = pollenDateFieldMap[selectedCity.label];
-            if (!pollenDateField) {
-                console.error('Invalid city label:', selectedCity.label);
-                return;
-            }
-
             const mergedData = allWeatherData.map(wd => {
                 const merged = { ...wd };
                 morphotypes.forEach(morph => {
@@ -144,11 +166,15 @@ const MainView = () => {
                 return merged;
             });
 
-            // Filter merged data to only include entries within the original selected date range
+            // Filter merged data to only include entries within the user-selected date range
+            const startObj = new Date(startStr);
+            const endObj = new Date(endStr);
             const filteredData = mergedData.filter(d => {
-                const dateStr = d.time?.slice(0, 10);
-                return dateStr >= startDate && dateStr <= endDate;
+                const dt = new Date(d.time);
+                return dt >= startObj && dt <= endObj;
             });
+
+            console.log('[ShowGraph] Filtered/merged data for graph:', filteredData);
 
             setWeatherData(filteredData);
             setIsGraphVisible(true);
@@ -179,7 +205,7 @@ const MainView = () => {
                 <div className="block left-col">
                     <h3 className="section-title">{t('location')}</h3>
                     <LocationSelector selectedCity={selectedCity} setSelectedCity={setSelectedCity} />
-                    <CalendarExample onDateSelect={setSelectedDate} selectedDate={selectedDate} />
+                    <CalendarExample onDateSelect={handleCalendarSelect} selectedDate={selectedDate} />
                 </div>
                 <div className="block middle-col">
                     <h3 className="section-title">{t('morphotypes')}</h3>
