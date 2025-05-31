@@ -8,6 +8,8 @@ import timezone from "dayjs/plugin/timezone";
 import 'dayjs/locale/lt';
 import 'dayjs/locale/en';
 import 'dayjs/locale/uk';
+import { useMediaQuery } from '@mantine/hooks';
+
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -46,6 +48,7 @@ function CalendarExample({ onDateSelect, selectedDate }) {
     const handleChange = (range) => {
         setValue(range); // Do NOT add +1 day here
     };
+    const isMobile = useMediaQuery('(max-width: 900px)');
 
     return (
         <div className="calendar-container">
@@ -73,13 +76,24 @@ function CalendarExample({ onDateSelect, selectedDate }) {
                 firstDayOfWeek: 1,
                 weekendDays: [0, 6]
             }}>
-                <DatePicker
-                    className="custom-datepicker"
-                    type="range"
-                    value={value}
-                    onChange={handleChange}
-                    locale={localeMap[i18n.language] || 'en'}
-                />
+                {isMobile ? (
+                    <DatePicker
+                        className="custom-datepicker"
+                        type="default" // простий одноденний вибір
+                        value={value[0]}
+                        onChange={(date) => handleChange([date, date])}
+                        locale={localeMap[i18n.language] || 'en'}
+                    />
+                ) : (
+                    <DatePicker
+                        className="custom-datepicker"
+                        type="range"
+                        value={value}
+                        onChange={handleChange}
+                        locale={localeMap[i18n.language] || 'en'}
+                    />
+                )}
+
             </DatesProvider>
         </div>
     );

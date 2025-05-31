@@ -1,0 +1,165 @@
+:root {
+    --block-padding-tablet: 16px 10px 14px 10px;
+    --block-padding-mobile: 10px 4vw 10px 4vw;
+    --block-gap-tablet: 10px;
+    --block-gap-mobile: 8px;
+    --block-radius-tablet: 10px;
+    --block-radius-mobile: 8px;
+    --block-font-tablet: 1em;
+    --block-font-mobile: 0.98em;
+}
+
+/* Extra small: iPhone SE, small phones (max 375px) */
+@media (max-width: 375px) {
+    .parameters-panel {
+        grid-template-columns: 1fr;
+        gap: 6px;
+        padding: 0 3vw;
+    }
+    .block {
+        padding: 8px 3vw;
+        font-size: 0.9em;
+    }
+    .block-morphotypes .checkbox-list {
+        grid-template-columns: 1fr;
+        gap: 4px 0;
+    }
+}
+
+/* Small mobile (376px - 480px) */
+@media (min-width: 376px) and (max-width: 480px) {
+    .parameters-panel {
+        grid-template-columns: 1fr;
+        gap: 8px;
+        padding: 0 4vw;
+    }
+    .block {
+        padding: 10px 4vw;
+        font-size: 0.95em;
+    }
+}
+
+/* Standard mobile (481px - 600px) */
+@media (min-width: 481px) and (max-width: 600px) {
+    .parameters-panel {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        padding: 0 5vw;
+    }
+    .block {
+        padding: 12px 6vw;
+        font-size: 1em;
+    }
+}
+
+/* Large mobile / small tablets (601px - 767px) */
+@media (min-width: 601px) and (max-width: 767px) {
+    .parameters-panel {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        padding: 0 5vw;
+    }
+    .block {
+        padding: 14px 6vw;
+    }
+}
+
+/* iPad Mini, iPad Air Portrait (768px - 834px) */
+@media (min-width: 768px) and (max-width: 1180px) {
+    .parameters-panel {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 14px 12px;
+        padding: 0 3vw;
+    }
+
+    .block {
+        padding: 16px 10px;
+    }
+
+    .block-morphotypes .checkbox-list {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px 10px;
+    }
+}
+
+
+/* iPad Pro Portrait (835px - 1024px) */
+@media (min-width: 835px) and (max-width: 1024px) {
+    .parameters-panel {
+        grid-template-columns: 1fr 1fr;
+        gap: 16px 12px;
+        max-width: 960px;
+        padding: 0 3vw;
+    }
+    .block {
+        padding: 18px 12px;
+    }
+}
+
+/* Small laptops (1025px - 1200px) */
+@media (min-width: 1025px) and (max-width: 1200px) {
+    .parameters-panel {
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 20px 14px;
+        max-width: 1100px;
+        padding: 0 3vw;
+    }
+    .block {
+        padding: 20px 16px;
+    }
+    .block-morphotypes .checkbox-list {
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 10px 14px;
+    }
+}
+
+/* Standard desktop (1201px - 1440px) */
+@media (min-width: 1201px) and (max-width: 1440px) {
+    .parameters-panel {
+        grid-template-columns: 1fr 1.15fr 1fr;
+        gap: 50px;
+        max-width: 1200px;
+        padding: 0 2vw;
+    }
+}
+
+/* Large desktop (1441px - 1600px) */
+@media (min-width: 1441px) and (max-width: 1600px) {
+    .parameters-panel {
+        max-width: 1400px;
+        padding: 0 4vw;
+    }
+}
+
+/* Extra wide screens (1601px - 1920px) */
+@media (min-width: 1601px) and (max-width: 1920px) {
+    .parameters-panel {
+        max-width: 1600px;
+        padding: 0 6vw;
+    }
+}
+
+/* Ultra wide (1921px - 2560px) */
+@media (min-width: 1921px) and (max-width: 2560px) {
+    .parameters-panel {
+        max-width: 1800px;
+        padding: 0 8vw;
+    }
+}
+
+/* Retina 5K displays (2561px - 3200px) */
+@media (min-width: 2561px) and (max-width: 3200px) {
+    .parameters-panel {
+        max-width: 2000px;
+        padding: 0 10vw;
+    }
+}
+
+/* TV / projector (3201px+) */
+@media (min-width: 3201px) {
+    .parameters-panel {
+        max-width: 2400px;
+        padding: 0 12vw;
+    }
+}

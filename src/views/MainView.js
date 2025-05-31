@@ -8,6 +8,7 @@ import GraphTypeSelector from '../components/parameters/GraphTypeSelector';
 import '../styles/MainView.css';
 import { useTranslation } from 'react-i18next';
 import dayjs from "dayjs";
+import '../styles/responsive.css'
 
 const paramKeys = {
     "Temperature": "temperature",
@@ -204,7 +205,7 @@ const MainView = () => {
                     <LocationSelector selectedCity={selectedCity} setSelectedCity={setSelectedCity} />
                     <CalendarExample onDateSelect={handleCalendarSelect} selectedDate={selectedDate} />
                 </div>
-                <div className="block middle-col">
+                <div className="block block-morphotypes middle-col">
                     <h3 className="section-title">{t('morphotypes')}</h3>
                     <MorphotypesSelector selectedParams={selectedParams} setSelectedParams={setSelectedParams} />
                 </div>

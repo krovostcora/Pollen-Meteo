@@ -8,6 +8,11 @@
     background-color: #FFFFFF;
 
 }
+.block-morphotypes .checkbox-list {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 12px;
+}
 
 .section {
     display: flex;
@@ -269,3 +274,4 @@
         width: 100%;
     }
 }
+
