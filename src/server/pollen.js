@@ -1,4 +1,3 @@
-// src/server/pollen.js
 const express = require('express');
 const router = express.Router();
 const { Pool } = require('pg');
@@ -25,7 +24,7 @@ const validMorphotypes = [
 ];
 
 router.post('/pollen', async (req, res) => {
-  const { stationName, startDate, endDate, morphotypes } = req.body;
+  const { stationName, startDate, endDate, morphotypes, granularity } = req.body;
   console.log('Request body:', req.body);
 
   if (!stationName || !startDate || !endDate || !Array.isArray(morphotypes)) {
@@ -45,13 +44,27 @@ router.post('/pollen', async (req, res) => {
 
   const { table, dateColumn } = stationData;
 
-  // Build query with identifiers injected, values parameterized
-  const query = format(
-      'SELECT * FROM %I WHERE DATE(%I) BETWEEN $1 AND $2 AND "Particle" = ANY($3) ORDER BY %I LIMIT 100',
-      table, dateColumn, dateColumn
-  );
-
-  // Log query and parameters for debugging
+  let query;
+  if (granularity === 'daily') {
+    // Aggregate by day (sum all hourly columns for each day)
+    query = format(
+        `SELECT "%I" as date, "Particle",
+                COALESCE("00-02",0)+COALESCE("02-04",0)+COALESCE("04-06",0)+COALESCE("06-08",0)+
+                COALESCE("08-10",0)+COALESCE("10-12",0)+COALESCE("12-14",0)+COALESCE("14-16",0)+
+                COALESCE("16-18",0)+COALESCE("18-20",0)+COALESCE("20-22",0)+COALESCE("22-24",0) as total
+         FROM %I
+         WHERE DATE(%I) BETWEEN $1 AND $2 AND "Particle" = ANY($3)
+         ORDER BY %I, "Particle"
+         LIMIT 100`,
+        dateColumn, table, dateColumn, dateColumn
+    );
+  } else {
+    // Return all hourly columns for each day
+    query = format(
+        'SELECT * FROM %I WHERE DATE(%I) BETWEEN $1 AND $2 AND "Particle" = ANY($3) ORDER BY %I, "Particle" LIMIT 100',
+        table, dateColumn, dateColumn
+    );
+  }
   console.log('Generated query:', query);
   console.log('Parameters:', [startDate, endDate, filteredMorphotypes]);
 

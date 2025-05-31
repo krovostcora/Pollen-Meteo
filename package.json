@@ -44,6 +44,7 @@
     "html2canvas": "^1.4.1",
     "i18next": "^25.0.2",
     "jspdf": "^3.0.1",
+    "luxon": "^3.6.1",
     "node-fetch": "^3.3.2",
     "react-i18next": "^15.5.1",
     "react-scripts": "^5.0.1",

@@ -11,8 +11,9 @@ app.use(express.json());
 app.use('/', pollenRouter);
 
 app.post('/weather', async (req, res) => {
-    const { stationCode, date } = req.body;
+    const { stationCode, date, granularity } = req.body;
 
+    // meteo.lt API only provides hourly data, so just return all observations for the day
     const url = date
         ? `https://api.meteo.lt/v1/stations/${stationCode}/observations/${date}`
         : `https://api.meteo.lt/v1/stations/${stationCode}/observations/latest`;
@@ -26,7 +27,7 @@ app.post('/weather', async (req, res) => {
 
         const data = await response.json();
 
-        const observations = data.observations.map(obs => ({
+        let observations = data.observations.map(obs => ({
             time: obs.observationTimeUtc,
             temperature: obs.airTemperature,
             humidity: obs.relativeHumidity,
@@ -35,13 +36,26 @@ app.post('/weather', async (req, res) => {
             wind_direction: obs.windDirection
         }));
 
+        // If daily granularity, aggregate by day (average)
+        if (granularity === 'daily' && observations.length > 0) {
+            const day = observations[0].time.slice(0, 10);
+            const avg = arr => arr.reduce((a, b) => a + b, 0) / arr.length;
+            observations = [{
+                time: day,
+                temperature: avg(observations.map(o => o.temperature)),
+                humidity: avg(observations.map(o => o.humidity)),
+                precipitation: avg(observations.map(o => o.precipitation)),
+                wind_speed: avg(observations.map(o => o.wind_speed)),
+                wind_direction: avg(observations.map(o => o.wind_direction))
+            }];
+        }
+
         res.json(observations);
     } catch (error) {
         console.error("Failed to fetch weather data:", error);
         res.status(500).json({ error: 'Failed to fetch weather data' });
     }
 });
-
 
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);

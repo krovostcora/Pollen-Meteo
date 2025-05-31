@@ -57,9 +57,9 @@ const MainView = () => {
     const [error, setError] = useState('');
     const [isGraphVisible, setIsGraphVisible] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [granularity, setGranularity] = useState('daily'); // 'daily' or 'hourly'
     const { t } = useTranslation();
 
-    // Log calendar selection
     const handleCalendarSelect = (dateRange) => {
         console.log('[Calendar] User selected date range:', dateRange);
         setSelectedDate(dateRange);
@@ -102,6 +102,7 @@ const MainView = () => {
                     body: JSON.stringify({
                         stationCode: selectedCity.code,
                         date: day,
+                        granularity, // Pass granularity to backend
                     }),
                 });
                 if (response.ok) {
@@ -138,6 +139,7 @@ const MainView = () => {
                         startDate: startStr,
                         endDate: endStr,
                         morphotypes: morphotypes,
+                        granularity, // Pass granularity to backend if needed
                     }),
                 });
                 pollenData = pollenResponse.ok ? await pollenResponse.json() : [];
@@ -195,6 +197,7 @@ const MainView = () => {
         setWeatherData([]);
         setError('');
         setIsGraphVisible(false);
+        setGranularity('daily');
     };
 
     const isAnyFilterSelected = selectedCity || selectedGraph || selectedParams.length > 0 || selectedDate;
@@ -218,6 +221,26 @@ const MainView = () => {
                     <GraphTypeSelector selectedGraph={selectedGraph} setSelectedGraph={setSelectedGraph} />
                 </div>
             </div>
+            <div className="granularity-selector" style={{ margin: '20px 0' }}>
+                <label>
+                    <input
+                        type="radio"
+                        value="daily"
+                        checked={granularity === 'daily'}
+                        onChange={() => setGranularity('daily')}
+                    />
+                    {t('daily')}
+                </label>
+                <label style={{ marginLeft: '20px' }}>
+                    <input
+                        type="radio"
+                        value="hourly"
+                        checked={granularity === 'hourly'}
+                        onChange={() => setGranularity('hourly')}
+                    />
+                    {t('hourly')}
+                </label>
+            </div>
             <div className="buttons-container">
                 <div className="button-wrapper">
                     <button className="show-button" onClick={handleShowGraph} disabled={loading}>
@@ -239,6 +262,7 @@ const MainView = () => {
                         weatherData={weatherData}
                         selectedGraph={selectedGraph}
                         selectedParams={selectedParams}
+                        granularity={granularity}
                     />
                 </div>
             )}

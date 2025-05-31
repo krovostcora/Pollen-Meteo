@@ -2,12 +2,12 @@
   "showGraph": "Показати графік",
   "reset": "Скинути",
   "downloadPDF": "Завантажити PDF",
-  "location": "Локація",
+  "location": "Місце",
   "startTyping": "Почніть вводити...",
   "start": "Початок",
-  "startNotSelected": "Не обрано",
+  "startNotSelected": "Не вибрано",
   "end": "Кінець",
-  "endNotSelected": "Не обрано",
+  "endNotSelected": "Не вибрано",
   "mo": "Пн",
   "tu": "Вт",
   "we": "Ср",
@@ -24,7 +24,9 @@
   "windSpeed": "Швидкість вітру",
   "typeOfGraph": "Тип графіка",
   "lineGraph": "Лінійний графік",
-  "barChart": "Стовпчиковий графік",
-  "scatterPlot": "Точковий графік",
-  "notSelected": "Не обрано"
+  "barChart": "Стовпчаста діаграма",
+  "scatterPlot": "Точкова діаграма",
+  "notSelected": "Не вибрано",
+  "daily": "Денний",
+  "hourly": "Погодинний"
 }

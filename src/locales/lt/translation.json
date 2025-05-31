@@ -26,5 +26,7 @@
   "lineGraph": "Linijinė diagrama",
   "barChart": "Stulpelinė diagrama",
   "scatterPlot": "Sklaidos diagrama",
-  "notSelected": "Nepasirinkta"
+  "notSelected": "Nepasirinkta",
+  "daily": "Dieninis",
+  "hourly": "Valandinis"
 }
