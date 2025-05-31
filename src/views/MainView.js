@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import WeatherGraph from '../components/WeatherGraph';
 import CalendarExample from '../components/calendar';
 import LocationSelector from '../components/parameters/LocationSelector';
@@ -43,11 +43,6 @@ const pollenDateFieldMap = {
     Klaipeda: "LTKLAI"
 };
 
-function formatDate(date) {
-    if (typeof date === 'string') return date.slice(0, 10);
-    return date.toISOString().slice(0, 10);
-}
-
 const MainView = () => {
     const [selectedCity, setSelectedCity] = useState(null);
     const [selectedDate, setSelectedDate] = useState('');
@@ -57,31 +52,30 @@ const MainView = () => {
     const [error, setError] = useState('');
     const [isGraphVisible, setIsGraphVisible] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [granularity, setGranularity] = useState('daily'); // 'daily' or 'hourly'
+    const [granularity, setGranularity] = useState('hourly'); // always hourly
     const { t } = useTranslation();
 
+    useEffect(() => {
+        if (!isGraphVisible) return;
+        fetchData(granularity);
+        // eslint-disable-next-line
+    }, [granularity, isGraphVisible]);
+
     const handleCalendarSelect = (dateRange) => {
-        console.log('[Calendar] User selected date range:', dateRange);
         setSelectedDate(dateRange);
     };
 
-    const handleShowGraph = async () => {
+    const fetchData = async (gran) => {
         if (!selectedCity || !selectedDate || selectedDate.length !== 2) {
             setError('Please select city and date range');
             return;
         }
         setLoading(true);
         setError('');
-        setIsGraphVisible(false);
-
         try {
             const [userStartDate, userEndDate] = selectedDate || [];
             const startStr = userStartDate ? dayjs(userStartDate).format('YYYY-MM-DD') : '';
             const endStr = userEndDate ? dayjs(userEndDate).format('YYYY-MM-DD') : '';
-
-            console.log('[ShowGraph] User selected city:', selectedCity);
-            console.log('[ShowGraph] User selected start date:', startStr);
-            console.log('[ShowGraph] User selected end date:', endStr);
 
             // Prepare date strings for weather fetch (inclusive)
             const dates = [];
@@ -91,7 +85,6 @@ const MainView = () => {
                 dates.push(current.toISOString().slice(0, 10));
                 current.setDate(current.getDate() + 1);
             }
-            console.log('[ShowGraph] Dates to fetch weather for:', dates);
 
             // Fetch weather data
             const allWeatherData = [];
@@ -102,7 +95,7 @@ const MainView = () => {
                     body: JSON.stringify({
                         stationCode: selectedCity.code,
                         date: day,
-                        granularity, // Pass granularity to backend
+                        granularity: gran,
                     }),
                 });
                 if (response.ok) {
@@ -110,7 +103,6 @@ const MainView = () => {
                     allWeatherData.push(...data);
                 }
             }
-            console.log('[ShowGraph] Weather data:', allWeatherData);
 
             // Prepare morphotype codes for pollen fetch
             const morphotypes = selectedParams
@@ -122,7 +114,6 @@ const MainView = () => {
             const backendCity = cityLabelToBackend[selectedCity.label];
             const pollenDateField = pollenDateFieldMap[backendCity];
             if (!pollenDateField) {
-                console.error('Invalid city label:', selectedCity.label, 'Backend city:', backendCity);
                 setError('Invalid city selection');
                 setLoading(false);
                 return;
@@ -139,12 +130,11 @@ const MainView = () => {
                         startDate: startStr,
                         endDate: endStr,
                         morphotypes: morphotypes,
-                        granularity, // Pass granularity to backend if needed
+                        granularity: gran,
                     }),
                 });
                 pollenData = pollenResponse.ok ? await pollenResponse.json() : [];
             }
-            console.log('[ShowGraph] Pollen data:', pollenData);
 
             // Merge pollen data into weather data using correct date field
             const mergedData = allWeatherData.map(wd => {
@@ -176,18 +166,22 @@ const MainView = () => {
                 return dt >= startObj && dt <= endObj;
             });
 
-            console.log('[ShowGraph] Filtered/merged data for graph:', filteredData);
-
             setWeatherData(filteredData);
-            setIsGraphVisible(true);
         } catch (err) {
             setError('Failed to load data');
-            setIsGraphVisible(false);
-            console.error(err);
+            setWeatherData([]);
         } finally {
             setLoading(false);
         }
     };
+
+    const handleShowGraph = async () => {
+        setGranularity('hourly'); // always start with hourly
+        setIsGraphVisible(true);
+        await fetchData('hourly');
+    };
+
+    // No handleSwitchGranularity needed, as we never switch to daily
 
     const handleReset = () => {
         setSelectedCity(null);
@@ -197,7 +191,7 @@ const MainView = () => {
         setWeatherData([]);
         setError('');
         setIsGraphVisible(false);
-        setGranularity('daily');
+        setGranularity('hourly');
     };
 
     const isAnyFilterSelected = selectedCity || selectedGraph || selectedParams.length > 0 || selectedDate;
@@ -221,26 +215,6 @@ const MainView = () => {
                     <GraphTypeSelector selectedGraph={selectedGraph} setSelectedGraph={setSelectedGraph} />
                 </div>
             </div>
-            <div className="granularity-selector" style={{ margin: '20px 0' }}>
-                <label>
-                    <input
-                        type="radio"
-                        value="daily"
-                        checked={granularity === 'daily'}
-                        onChange={() => setGranularity('daily')}
-                    />
-                    {t('daily')}
-                </label>
-                <label style={{ marginLeft: '20px' }}>
-                    <input
-                        type="radio"
-                        value="hourly"
-                        checked={granularity === 'hourly'}
-                        onChange={() => setGranularity('hourly')}
-                    />
-                    {t('hourly')}
-                </label>
-            </div>
             <div className="buttons-container">
                 <div className="button-wrapper">
                     <button className="show-button" onClick={handleShowGraph} disabled={loading}>
@@ -257,14 +231,16 @@ const MainView = () => {
             </div>
             {error && <div className="error">{error}</div>}
             {isGraphVisible && (
-                <div className="graph-section">
-                    <WeatherGraph
-                        weatherData={weatherData}
-                        selectedGraph={selectedGraph}
-                        selectedParams={selectedParams}
-                        granularity={granularity}
-                    />
-                </div>
+                <>
+                    <div className="graph-section">
+                        <WeatherGraph
+                            weatherData={weatherData}
+                            selectedGraph={selectedGraph}
+                            selectedParams={selectedParams}
+                            granularity={granularity}
+                        />
+                    </div>
+                </>
             )}
         </div>
     );

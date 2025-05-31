@@ -5,8 +5,13 @@ import {
 } from 'recharts';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { useTranslation } from 'react-i18next';
 
-// Parameter mappings
+const COLORS = [
+    "#8884d8", "#82ca9d", "#ffc658", "#ff7300", "#0088FE",
+    "#00C49F", "#FFBB28", "#FF8042", "#A28FD0", "#FF6699"
+];
+
 const morphotypeNameToCode = {
     Alnus: "ALNU", Artemisia: "ARTE", Ambrosia: "AMBR", Corylus: "CORY",
     Betula: "BETU", Quercus: "QUER", Pinus: "PINA", Poaceae: "POAC",
@@ -17,12 +22,7 @@ const paramKeys = {
     "Precipitation": "precipitation", "Wind speed": "wind_speed",
     "Wind direction": "wind_direction"
 };
-const COLORS = [
-    "#8884d8", "#82ca9d", "#ffc658", "#ff7300", "#0088FE",
-    "#00C49F", "#FFBB28", "#FF8042", "#A28FD0", "#FF6699"
-];
 
-// Utility: ensure every day in range has a 00:00 tick
 function ensureMidnightTicks(data) {
     if (!data || data.length === 0) return [];
     const byDay = {};
@@ -32,16 +32,12 @@ function ensureMidnightTicks(data) {
         if (!byDay[day]) byDay[day] = {};
         byDay[day][hour] = d;
     });
-
-    // Find all days in the range
     const first = new Date(data[0].time.slice(0, 10));
     const last = new Date(data[data.length - 1].time.slice(0, 10));
     const days = [];
     for (let d = new Date(first); d <= last; d.setDate(d.getDate() + 1)) {
         days.push(d.toISOString().slice(0, 10));
     }
-
-    // Insert 00:00 if missing
     let result = [...data];
     days.forEach(day => {
         if (!byDay[day] || !byDay[day][0]) {
@@ -51,14 +47,11 @@ function ensureMidnightTicks(data) {
             });
         }
     });
-
-    // Sort by time
     result.sort((a, b) => new Date(a.time) - new Date(b.time));
     return result;
 }
 
-// Format X-axis ticks
-function formatTick(tick, granularity) {
+function formatTick(tick, granularity, t) {
     if (!tick) return '';
     const d = new Date(tick);
     if (isNaN(d)) return tick;
@@ -68,40 +61,25 @@ function formatTick(tick, granularity) {
     return d.toISOString().slice(0, 10);
 }
 
-// Custom XAxis tick for daily/hourly granularity
-const CustomDateTick = ({ x, y, payload, index, data, granularity }) => {
+const CustomDateTick = ({ x, y, payload, index, data, granularity, t }) => {
     const current = new Date(payload.value);
     if (granularity === 'hourly') {
         const hour = current.getHours();
         return (
             <g>
-                <text
-                    x={x}
-                    y={y + 18}
-                    textAnchor="middle"
-                    fontSize={12}
-                    fill="#555"
-                >
+                <text x={x} y={y + 18} textAnchor="middle" fontSize={12} fill="#555">
                     {current.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </text>
                 {hour === 0 && (
-                    <text
-                        x={x}
-                        y={y + 34}
-                        textAnchor="middle"
-                        fontSize={11}
-                        fontWeight="bold"
-                        fill="#222"
-                    >
+                    <text x={x} y={y + 34} textAnchor="middle" fontSize={11} fontWeight="bold" fill="#222">
                         {current.toISOString().slice(0, 10)}
                     </text>
                 )}
             </g>
         );
     }
-    // For daily, show only if date changes
-    const currentDate = formatTick(payload.value, 'daily');
-    const prevDate = index > 0 ? formatTick(data[index - 1].time, 'daily') : null;
+    const currentDate = formatTick(payload.value, 'daily', t);
+    const prevDate = index > 0 ? formatTick(data[index - 1].time, 'daily', t) : null;
     if (currentDate !== prevDate) {
         return (
             <text x={x} y={y + 18} textAnchor="middle" fontSize={12}>
@@ -112,15 +90,23 @@ const CustomDateTick = ({ x, y, payload, index, data, granularity }) => {
     return null;
 };
 
-// Tooltip with only color/style changes
-const CustomTooltip = ({ active, payload, label, granularity }) => {
+// Inside src/components/WeatherGraph.js
+
+const CustomTooltip = ({ active, payload, label, granularity, t }) => {
     if (active && payload && payload.length) {
+        let dateStr = '';
+        if (granularity === 'hourly') {
+            const date = new Date(label);
+            dateStr = `${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+        } else {
+            dateStr = formatTick(label, granularity, t);
+        }
         return (
             <div className="weather-graph-tooltip">
-                <p>{formatTick(label, granularity)}</p>
+                <p>{dateStr}</p>
                 {payload.map((entry, i) => (
                     <p key={i} style={{ color: entry.color }}>
-                        {entry.name}: {entry.value}
+                        {t(entry.name) || entry.name}: {entry.value}
                     </p>
                 ))}
             </div>
@@ -130,18 +116,27 @@ const CustomTooltip = ({ active, payload, label, granularity }) => {
 };
 
 const WeatherGraph = ({ weatherData, selectedGraph, selectedParams, granularity }) => {
+    const { t } = useTranslation();
     const graphRef = useRef();
 
-    // Build param list with keys and display names
     const paramList = useMemo(() =>
         selectedParams.map((name) => {
-            if (morphotypeNameToCode[name]) return { key: morphotypeNameToCode[name], name };
-            if (paramKeys[name]) return { key: paramKeys[name], name };
+            // Check for combined names like "AlnusTemperature"
+            const match = name.match(/^([A-Za-z]+)(Temperature|Humidity|Precipitation|Wind speed|Wind direction)$/);
+            if (match) {
+                const morphotype = match[1];
+                const param = match[2];
+                return {
+                    key: morphotypeNameToCode[morphotype] + '_' + paramKeys[param],
+                    name: `${t(morphotype)} ${t(param)}`
+                };
+            }
+            if (morphotypeNameToCode[name]) return { key: morphotypeNameToCode[name], name: t(name) };
+            if (paramKeys[name]) return { key: paramKeys[name], name: t(name) };
             return null;
-        }).filter(Boolean), [selectedParams]
+        }).filter(Boolean), [selectedParams, t]
     );
 
-    // Preprocess data for hourly granularity
     const processedData = useMemo(() =>
             granularity === 'hourly'
                 ? ensureMidnightTicks(weatherData)
@@ -149,14 +144,12 @@ const WeatherGraph = ({ weatherData, selectedGraph, selectedParams, granularity 
         [weatherData, granularity]
     );
 
-    // Chart common props
     const commonProps = {
         width: 1200,
         height: 600,
         margin: { top: 20, right: 80, left: -20, bottom: 70 }
     };
 
-    // Render chart content (lines, bars, scatters)
     const renderChartContent = () => paramList.map(({ key, name }, idx) => {
         const color = COLORS[idx % COLORS.length];
         switch (selectedGraph) {
@@ -167,7 +160,7 @@ const WeatherGraph = ({ weatherData, selectedGraph, selectedParams, granularity 
                         type="monotone"
                         dataKey={key}
                         stroke={color}
-                        name={name}
+                        name={t(name)}
                         dot={false}
                         isAnimationActive={false}
                     />
@@ -178,7 +171,7 @@ const WeatherGraph = ({ weatherData, selectedGraph, selectedParams, granularity 
                         key={key}
                         dataKey={key}
                         fill={color}
-                        name={name}
+                        name={t(name)}
                     />
                 );
             case 'scatter':
@@ -189,7 +182,7 @@ const WeatherGraph = ({ weatherData, selectedGraph, selectedParams, granularity 
                 return (
                     <Scatter
                         key={key}
-                        name={name}
+                        name={t(name)}
                         data={formattedData}
                         fill={color}
                     />
@@ -199,7 +192,6 @@ const WeatherGraph = ({ weatherData, selectedGraph, selectedParams, granularity 
         }
     });
 
-    // Render the selected chart type
     const renderChart = () => {
         const xAxisProps = {
             minTickGap: 10,
@@ -209,6 +201,7 @@ const WeatherGraph = ({ weatherData, selectedGraph, selectedParams, granularity 
                     {...props}
                     data={processedData}
                     granularity={granularity}
+                    t={t}
                 />
         };
 
@@ -219,16 +212,16 @@ const WeatherGraph = ({ weatherData, selectedGraph, selectedParams, granularity 
                         <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
                         <XAxis
                             dataKey="time"
-                            tickFormatter={tick => formatTick(tick, granularity)}
+                            tickFormatter={tick => formatTick(tick, granularity, t)}
                             {...xAxisProps}
                         />
                         <YAxis />
-                        <Tooltip content={<CustomTooltip granularity={granularity} />} />
+                        <Tooltip content={<CustomTooltip granularity={granularity} t={t} />} />
                         <Legend verticalAlign="bottom" height={50} />
                         {renderChartContent()}
                         <Brush
                             dataKey="time"
-                            tickFormatter={tick => formatTick(tick, granularity)}
+                            tickFormatter={tick => formatTick(tick, granularity, t)}
                             height={30}
                             stroke="#8884d8"
                         />
@@ -240,16 +233,16 @@ const WeatherGraph = ({ weatherData, selectedGraph, selectedParams, granularity 
                         <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
                         <XAxis
                             dataKey="time"
-                            tickFormatter={tick => formatTick(tick, granularity)}
+                            tickFormatter={tick => formatTick(tick, granularity, t)}
                             {...xAxisProps}
                         />
                         <YAxis />
-                        <Tooltip content={<CustomTooltip granularity={granularity} />} />
+                        <Tooltip content={<CustomTooltip granularity={granularity} t={t} />} />
                         <Legend verticalAlign="bottom" height={50} />
                         {renderChartContent()}
                         <Brush
                             dataKey="time"
-                            tickFormatter={tick => formatTick(tick, granularity)}
+                            tickFormatter={tick => formatTick(tick, granularity, t)}
                             height={30}
                             stroke="#8884d8"
                         />
@@ -261,17 +254,17 @@ const WeatherGraph = ({ weatherData, selectedGraph, selectedParams, granularity 
                         <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
                         <XAxis
                             dataKey="x"
-                            name="Time"
-                            tickFormatter={tick => formatTick(tick, granularity)}
+                            name={t('time')}
+                            tickFormatter={tick => formatTick(tick, granularity, t)}
                             {...xAxisProps}
                         />
                         <YAxis />
-                        <Tooltip content={<CustomTooltip granularity={granularity} />} />
+                        <Tooltip content={<CustomTooltip granularity={granularity} t={t} />} />
                         <Legend verticalAlign="bottom" height={50} />
                         {renderChartContent()}
                         <Brush
                             dataKey="x"
-                            tickFormatter={tick => formatTick(tick, granularity)}
+                            tickFormatter={tick => formatTick(tick, granularity, t)}
                             height={30}
                             stroke="#8884d8"
                         />
@@ -282,7 +275,6 @@ const WeatherGraph = ({ weatherData, selectedGraph, selectedParams, granularity 
         }
     };
 
-    // PDF download handler
     const handleDownloadPDF = async () => {
         if (!graphRef.current) return;
         const canvas = await html2canvas(graphRef.current);
@@ -304,7 +296,7 @@ const WeatherGraph = ({ weatherData, selectedGraph, selectedParams, granularity 
                 {renderChart()}
             </div>
             <button className="download-button" onClick={handleDownloadPDF}>
-                Download PDF
+                {t('downloadPDF')}
             </button>
         </div>
     );
