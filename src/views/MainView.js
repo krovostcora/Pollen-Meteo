@@ -8,7 +8,6 @@ import GraphTypeSelector from '../components/parameters/GraphTypeSelector';
 import '../styles/MainView.css';
 import { useTranslation } from 'react-i18next';
 
-// Weather parameter display names to DB keys
 const paramKeys = {
     "Temperature": "temperature",
     "Humidity": "humidity",
@@ -17,7 +16,6 @@ const paramKeys = {
     "Wind direction": "wind_direction"
 };
 
-// Morphotype display names to DB codes
 const morphotypeNameToCode = {
     Alnus: "ALNU",
     Artemisia: "ARTE",
@@ -32,12 +30,18 @@ const morphotypeNameToCode = {
     Acer: "ACER"
 };
 
-// Map city label to pollen date field
 const pollenDateFieldMap = {
     Vilnius: "LTVILN",
     Siauliai: "LTSIAU",
     Klaipeda: "LTKLAI"
 };
+
+// Helper to add days to a YYYY-MM-DD string
+function addDays(dateStr, days) {
+    const d = new Date(dateStr);
+    d.setDate(d.getDate() + days);
+    return d.toISOString().slice(0, 10);
+}
 
 const MainView = () => {
     const [selectedCity, setSelectedCity] = useState(null);
@@ -61,22 +65,16 @@ const MainView = () => {
 
         try {
             const [startDate, endDate] = selectedDate;
-            const start = new Date(startDate);
-            const end = new Date(endDate);
-
-            // Add 2 days to start and end dates
-            start.setDate(start.getDate() + 2);
-            end.setDate(end.getDate() + 2);
-
-            start.setHours(0, 0, 0, 0);
-            end.setHours(23, 59, 59, 999);
+            // Adjust dates for API requests
+            const pollenStartDate = addDays(startDate, -1);
+            const pollenEndDate = addDays(endDate, 1);
 
             // Prepare date strings for weather fetch
             const dates = [];
-            let date = new Date(start);
-            while (date <= end) {
-                dates.push(date.toISOString().slice(0, 10));
-                date.setDate(date.getDate() + 1);
+            let current = pollenStartDate;
+            while (current <= pollenEndDate) {
+                dates.push(current);
+                current = addDays(current, 1);
             }
 
             // Fetch weather data
@@ -110,8 +108,8 @@ const MainView = () => {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         stationName: selectedCity.label,
-                        startDate: start.toISOString().slice(0, 10),
-                        endDate: end.toISOString().slice(0, 10),
+                        startDate: pollenStartDate,
+                        endDate: pollenEndDate,
                         morphotypes: morphotypes,
                     }),
                 });
@@ -119,11 +117,6 @@ const MainView = () => {
             }
 
             // Merge pollen data into weather data using correct date field
-            // Debug: Log weather and pollen data
-            console.log('Weather Data:', allWeatherData);
-            console.log('Pollen Data:', pollenData);
-
-// Find the correct pollen date field for the selected city
             const pollenDateField = pollenDateFieldMap[selectedCity.label];
             if (!pollenDateField) {
                 console.error('Invalid city label:', selectedCity.label);
@@ -151,7 +144,13 @@ const MainView = () => {
                 return merged;
             });
 
-            setWeatherData(mergedData);
+            // Filter merged data to only include entries within the original selected date range
+            const filteredData = mergedData.filter(d => {
+                const dateStr = d.time?.slice(0, 10);
+                return dateStr >= startDate && dateStr <= endDate;
+            });
+
+            setWeatherData(filteredData);
             setIsGraphVisible(true);
         } catch (err) {
             setError('Failed to load data');
