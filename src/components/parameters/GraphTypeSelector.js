@@ -7,7 +7,6 @@ const GraphTypeSelector = ({ selectedGraph, setSelectedGraph }) => {
     const graphTypes = [
         { value: "line", label: t('lineGraph') },
         { value: "bar", label: t('barChart') },
-        { value: "scatter", label: t('scatterPlot') },
     ];
 
     return (

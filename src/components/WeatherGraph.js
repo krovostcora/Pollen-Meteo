@@ -1,6 +1,6 @@
 import React, { useRef, useMemo } from 'react';
 import {
-    LineChart, Line, BarChart, Bar, ScatterChart, Scatter,
+    LineChart, Line, BarChart, Bar,
     CartesianGrid, XAxis, YAxis, Tooltip, Legend, Brush
 } from 'recharts';
 import jsPDF from 'jspdf';
@@ -90,8 +90,6 @@ const CustomDateTick = ({ x, y, payload, index, data, granularity, t }) => {
     return null;
 };
 
-// Inside src/components/WeatherGraph.js
-
 const CustomTooltip = ({ active, payload, label, granularity, t }) => {
     if (active && payload && payload.length) {
         let dateStr = '';
@@ -121,7 +119,6 @@ const WeatherGraph = ({ weatherData, selectedGraph, selectedParams, granularity 
 
     const paramList = useMemo(() =>
         selectedParams.map((name) => {
-            // Check for combined names like "AlnusTemperature"
             const match = name.match(/^([A-Za-z]+)(Temperature|Humidity|Precipitation|Wind speed|Wind direction)$/);
             if (match) {
                 const morphotype = match[1];
@@ -150,47 +147,33 @@ const WeatherGraph = ({ weatherData, selectedGraph, selectedParams, granularity 
         margin: { top: 20, right: 80, left: -20, bottom: 70 }
     };
 
-    const renderChartContent = () => paramList.map(({ key, name }, idx) => {
-        const color = COLORS[idx % COLORS.length];
+    const renderChartContent = () => {
         switch (selectedGraph) {
             case 'line':
-                return (
+                return paramList.map(({ key, name }, idx) => (
                     <Line
                         key={key}
                         type="monotone"
                         dataKey={key}
-                        stroke={color}
+                        stroke={COLORS[idx % COLORS.length]}
                         name={t(name)}
                         dot={false}
                         isAnimationActive={false}
                     />
-                );
+                ));
             case 'bar':
-                return (
+                return paramList.map(({ key, name }, idx) => (
                     <Bar
                         key={key}
                         dataKey={key}
-                        fill={color}
+                        fill={COLORS[idx % COLORS.length]}
                         name={t(name)}
                     />
-                );
-            case 'scatter':
-                const formattedData = processedData.map(d => ({
-                    x: d.time,
-                    y: d[key]
-                }));
-                return (
-                    <Scatter
-                        key={key}
-                        name={t(name)}
-                        data={formattedData}
-                        fill={color}
-                    />
-                );
+                ));
             default:
                 return null;
         }
-    });
+    };
 
     const renderChart = () => {
         const xAxisProps = {
@@ -247,28 +230,6 @@ const WeatherGraph = ({ weatherData, selectedGraph, selectedParams, granularity 
                             stroke="#8884d8"
                         />
                     </BarChart>
-                );
-            case 'scatter':
-                return (
-                    <ScatterChart {...commonProps}>
-                        <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-                        <XAxis
-                            dataKey="x"
-                            name={t('time')}
-                            tickFormatter={tick => formatTick(tick, granularity, t)}
-                            {...xAxisProps}
-                        />
-                        <YAxis />
-                        <Tooltip content={<CustomTooltip granularity={granularity} t={t} />} />
-                        <Legend verticalAlign="bottom" height={50} />
-                        {renderChartContent()}
-                        <Brush
-                            dataKey="x"
-                            tickFormatter={tick => formatTick(tick, granularity, t)}
-                            height={30}
-                            stroke="#8884d8"
-                        />
-                    </ScatterChart>
                 );
             default:
                 return null;
