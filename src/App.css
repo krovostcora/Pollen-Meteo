@@ -69,7 +69,10 @@
 /* Dark theme styles */
 
 .dark .container {
-  color: #FFF;
+  color: #000000;
+}
+.dark .container .radio-label {
+  color: #FFFFFF;
 }
 
 .dark .header {

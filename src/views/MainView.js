@@ -68,8 +68,6 @@ const MainView = () => {
             const [startDate, endDate] = selectedDate;
             const startStr = dayjs(startDate).format('YYYY-MM-DD');
             const endStr = dayjs(endDate).format('YYYY-MM-DD');
-
-            // Build date array
             const dates = [];
             let current = new Date(startStr);
             const end = new Date(endStr);
@@ -77,11 +75,9 @@ const MainView = () => {
                 dates.push(current.toISOString().slice(0, 10));
                 current.setDate(current.getDate() + 1);
             }
-
-            // Fetch weather data
             const allWeatherData = [];
             for (const day of dates) {
-                const response = await fetch('http://localhost:3001/weather', {
+                const response = await fetch('http://84.32.188.59:3001/weather', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -95,14 +91,10 @@ const MainView = () => {
                     allWeatherData.push(...data);
                 }
             }
-
-            // Prepare morphotype codes
             const morphotypes = selectedParams
                 .filter(p => !Object.values(paramKeys).includes(p) && !paramKeys[p])
                 .map(name => morphotypeNameToCode[name])
                 .filter(Boolean);
-
-            // Get backend city and pollen field
             const backendCity = cityLabelToBackend[selectedCity.label];
             const pollenDateField = pollenDateFieldMap[backendCity];
             if (!pollenDateField) {
@@ -110,11 +102,9 @@ const MainView = () => {
                 setLoading(false);
                 return;
             }
-
-            // Fetch pollen data if needed
             let pollenData = [];
             if (morphotypes.length > 0) {
-                const pollenResponse = await fetch('http://localhost:3001/pollen', {
+                const pollenResponse = await fetch('http://84.32.188.59:3001/pollen', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -127,8 +117,6 @@ const MainView = () => {
                 });
                 pollenData = pollenResponse.ok ? await pollenResponse.json() : [];
             }
-
-            // Merge pollen into weather data
             const mergedData = allWeatherData.map(wd => {
                 const merged = { ...wd };
                 morphotypes.forEach(morph => {
@@ -149,7 +137,6 @@ const MainView = () => {
                 });
                 return merged;
             });
-
             setWeatherData(mergedData);
             setIsGraphVisible(true);
         } catch {
@@ -174,9 +161,9 @@ const MainView = () => {
         selectedCity || selectedGraph || selectedParams.length > 0 || (selectedDate && (selectedDate[0] || selectedDate[1]));
 
     return (
-        <div className="section">
+        <div className="main-view">
             <div className="parameters-panel">
-                <div className="block left-col">
+                <div className="light-blue-container left-col">
                     <h3 className="section-title">{t('location')}</h3>
                     <LocationSelector selectedCity={selectedCity} setSelectedCity={setSelectedCity} />
                     <Calendar
@@ -186,11 +173,11 @@ const MainView = () => {
                         setError={setError}
                     />
                 </div>
-                <div className="block block-morphotypes middle-col">
+                <div className="light-blue-container block-morphotypes middle-col">
                     <h3 className="section-title">{t('morphotypes')}</h3>
                     <MorphotypesSelector selectedParams={selectedParams} setSelectedParams={setSelectedParams} />
                 </div>
-                <div className="block right-col">
+                <div className="light-blue-container right-col">
                     <h3 className="section-title">{t('meteorologicalConditions')}</h3>
                     <MeteorologicalConditionsSelector selectedParams={selectedParams} setSelectedParams={setSelectedParams} />
                     <h3 className="section-title" style={{ marginTop: 20 }}>{t('typeOfGraph')}</h3>
@@ -198,23 +185,26 @@ const MainView = () => {
                 </div>
             </div>
             <div className="buttons-container">
-                <button
-                    className="show-button"
-                    onClick={handleShowGraph}
-                    disabled={loading}
-                >
-                    {loading ? t('loading') : t('showGraph')}
-                </button>
-                {isAnyFilterSelected && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', minWidth: 100 }}>
                     <button
-                        className="reset-button"
-                        onClick={handleReset}
+                        className="show-button"
+                        onClick={handleShowGraph}
                         disabled={loading}
                     >
-                        {t('reset')}
+                        {loading ? t('loading') : t('showGraph')}
                     </button>
-                )}
+                    {isAnyFilterSelected && (
+                        <button
+                            className="reset-button"
+                            onClick={handleReset}
+                            disabled={loading}
+                        >
+                            {t('reset')}
+                        </button>
+                    )}
+                </div>
             </div>
+
             {error && <div className="error">{error}</div>}
             {isGraphVisible && (
                 <div className="graph-section">

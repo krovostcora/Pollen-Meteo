@@ -19,7 +19,7 @@ export default function ThemeToggle() {
     }, []);
 
     return (
-        <div>
+        <div className="toggle-container">
             <input
                 type="checkbox"
                 className="theme-toggle-checkbox"

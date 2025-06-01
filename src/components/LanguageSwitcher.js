@@ -16,7 +16,7 @@ const LanguageSwitcher = () => {
     };
 
     return (
-        <select className="language-select" onChange={changeLanguage} value={i18n.language}>
+        <select className="language-select language-switcher" onChange={changeLanguage} value={i18n.language}>
             {languages.map(({ code, label, flag }) => (
                 <option key={code} value={code}>
                     {flag} {label}
