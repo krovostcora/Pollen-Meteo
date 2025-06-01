@@ -134,9 +134,10 @@
 
 .buttons-container {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 20px;
+    gap: 16px;
     margin: 20px 0;
     position: relative;
 }
@@ -154,17 +155,37 @@
 }
 
 .reset-button {
-    position: fixed;
-    margin-right: 40px;
-    right: 0;
-    padding: 10px 20px;
+    background-color: #FFD600;
+    color: #222;
+    font-weight: 600;
     border: none;
-    border-radius: 8px;
-    background-color: rgba(255, 47, 0, 0.56);
-    color: white;
-    font-size: 18px;
+    border-radius: 6px;
+    padding: 0.7em 2em;
+    font-size: 1rem;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: background 0.2s, color 0.2s;
+    z-index: 100;
+}
+
+.reset-button:hover {
+    background-color: #FFEA00;
+    color: #000;
+}
+
+.fixed-reset {
+    position: fixed;
+    right: 2rem;
+    bottom: 2rem;
+}
+
+@media (max-width: 768px) {
+    .fixed-reset {
+        right: 50%;
+        transform: translateX(50%);
+        bottom: 1rem;
+        left: auto;
+    }
 }
 
 .show-button:hover{
@@ -260,18 +281,4 @@
     color: #ff6b6b;
 }
 
-@media (max-width: 768px) {
-    .parameters-panel {
-        grid-template-columns: 1fr;
-    }
-
-    .buttons-container {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .block {
-        width: 100%;
-    }
-}
 

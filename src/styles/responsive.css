@@ -1,99 +1,148 @@
 :root {
-    --block-padding-tablet: 16px 10px 14px 10px;
-    --block-padding-mobile: 10px 4vw 10px 4vw;
-    --block-gap-tablet: 10px;
-    --block-gap-mobile: 8px;
-    --block-radius-tablet: 10px;
+    --block-padding-mobile: 10px 4vw;
+    --block-padding-tablet: 16px 10px;
+    --block-padding-desktop: 20px 16px;
     --block-radius-mobile: 8px;
-    --block-font-tablet: 1em;
+    --block-radius-tablet: 10px;
+    --block-radius-desktop: 12px;
     --block-font-mobile: 0.98em;
+    --block-font-tablet: 1em;
+    --block-font-desktop: 1.05em;
 }
 
-/* Extra small: iPhone SE, small phones (max 375px) */
+/* Base styles (mobile first) */
+.parameters-panel {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    width: 100%;
+    padding: 0 4vw;
+    max-width: 100vw;
+}
+
+.block {
+    padding: var(--block-padding-mobile);
+    border-radius: var(--block-radius-mobile);
+    font-size: var(--block-font-mobile);
+    width: 100%;
+}
+
+.block-morphotypes .checkbox-list {
+    display: grid !important;
+    grid-template-columns: 1fr;
+    gap: 4px 0;
+}
+
+.buttons-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    margin: 20px 0;
+    position: relative;
+}
+
+.download-button,
+.reset-button {
+    width: 100%;
+    min-width: 0;
+    font-size: 16px;
+    padding: 12px 0;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+}
+
+.fixed-reset {
+    position: fixed;
+    right: 50%;
+    transform: translateX(50%);
+    bottom: 1rem;
+    left: auto;
+    width: 90vw;
+    max-width: 400px;
+}
+
+.graph-section {
+    margin-top: 16px;
+    padding: 8px;
+    border-radius: var(--block-radius-mobile);
+    width: 100vw;
+    max-width: 100vw;
+    min-width: 0;
+    overflow-x: auto;
+    font-size: 14px;
+    background: #fafafa;
+}
+
+.graph-section canvas,
+.graph-section svg {
+    width: 100% !important;
+    height: auto !important;
+    max-width: 100vw !important;
+}
+
+.recharts-legend-wrapper {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    left: 0 !important;
+    font-size: 13px !important;
+    padding: 0 4px;
+    box-sizing: border-box;
+}
+
+/* Small mobile (max 375px) */
 @media (max-width: 375px) {
-    .parameters-panel {
-        grid-template-columns: 1fr;
-        gap: 6px;
-        padding: 0 3vw;
-    }
-    .block {
-        padding: 8px 3vw;
-        font-size: 0.9em;
-    }
-    .block-morphotypes .checkbox-list {
-        grid-template-columns: 1fr;
-        gap: 4px 0;
-    }
+    .parameters-panel { gap: 6px; padding: 0 3vw; }
+    .block { padding: 8px 3vw; font-size: 0.9em; }
 }
 
 /* Small mobile (376px - 480px) */
 @media (min-width: 376px) and (max-width: 480px) {
-    .parameters-panel {
-        grid-template-columns: 1fr;
-        gap: 8px;
-        padding: 0 4vw;
-    }
-    .block {
-        padding: 10px 4vw;
-        font-size: 0.95em;
-    }
+    .parameters-panel { gap: 8px; padding: 0 4vw; }
+    .block { padding: 10px 4vw; font-size: 0.95em; }
 }
 
 /* Standard mobile (481px - 600px) */
 @media (min-width: 481px) and (max-width: 600px) {
-    .parameters-panel {
-        grid-template-columns: 1fr;
-        gap: 10px;
-        padding: 0 5vw;
-    }
-    .block {
-        padding: 12px 6vw;
-        font-size: 1em;
-    }
+    .parameters-panel { gap: 10px; padding: 0 5vw; }
+    .block { padding: 12px 6vw; font-size: 1em; }
 }
 
 /* Large mobile / small tablets (601px - 767px) */
 @media (min-width: 601px) and (max-width: 767px) {
-    .parameters-panel {
-        grid-template-columns: 1fr;
-        gap: 12px;
-        padding: 0 5vw;
-    }
-    .block {
-        padding: 14px 6vw;
-    }
+    .parameters-panel { gap: 12px; padding: 0 5vw; }
+    .block { padding: 14px 6vw; }
 }
 
-/* iPad Mini, iPad Air Portrait (768px - 834px) */
-@media (min-width: 768px) and (max-width: 1180px) {
+/* Tablets (768px - 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
     .parameters-panel {
-        display: grid;
         grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
         gap: 14px 12px;
         padding: 0 3vw;
+        max-width: 960px;
     }
-
+    .buttons-container {
+        flex-direction: column;
+        gap: 16px;
+    }
     .block {
-        padding: 16px 10px;
+        padding: var(--block-padding-tablet);
+        border-radius: var(--block-radius-tablet);
+        font-size: var(--block-font-tablet);
     }
-
     .block-morphotypes .checkbox-list {
         grid-template-columns: 1fr 1fr;
         gap: 8px 10px;
     }
-}
-
-
-/* iPad Pro Portrait (835px - 1024px) */
-@media (min-width: 835px) and (max-width: 1024px) {
-    .parameters-panel {
-        grid-template-columns: 1fr 1fr;
-        gap: 16px 12px;
-        max-width: 960px;
-        padding: 0 3vw;
+    .graph-section {
+        padding: 16px;
+        border-radius: var(--block-radius-tablet);
+        font-size: 15px;
     }
-    .block {
-        padding: 18px 12px;
+    .recharts-legend-wrapper {
+        font-size: 14px !important;
     }
 }
 
@@ -106,11 +155,19 @@
         padding: 0 3vw;
     }
     .block {
-        padding: 20px 16px;
+        padding: var(--block-padding-desktop);
+        border-radius: var(--block-radius-desktop);
+        font-size: var(--block-font-desktop);
     }
     .block-morphotypes .checkbox-list {
         grid-template-columns: 1fr 1fr 1fr;
         gap: 10px 14px;
+    }
+    .graph-section {
+        padding: 20px;
+        border-radius: var(--block-radius-desktop);
+        font-size: 16px;
+        max-width: 1100px;
     }
 }
 
@@ -122,44 +179,29 @@
         max-width: 1200px;
         padding: 0 2vw;
     }
+    .graph-section { max-width: 1200px; }
 }
 
 /* Large desktop (1441px - 1600px) */
 @media (min-width: 1441px) and (max-width: 1600px) {
-    .parameters-panel {
-        max-width: 1400px;
-        padding: 0 4vw;
-    }
+    .parameters-panel { max-width: 1400px; padding: 0 4vw; }
+    .graph-section { max-width: 1400px; }
 }
 
 /* Extra wide screens (1601px - 1920px) */
 @media (min-width: 1601px) and (max-width: 1920px) {
-    .parameters-panel {
-        max-width: 1600px;
-        padding: 0 6vw;
-    }
+    .parameters-panel { max-width: 1600px; padding: 0 6vw; }
+    .graph-section { max-width: 1600px; }
 }
 
-/* Ultra wide (1921px - 2560px) */
-@media (min-width: 1921px) and (max-width: 2560px) {
-    .parameters-panel {
-        max-width: 1800px;
-        padding: 0 8vw;
-    }
-}
-
-/* Retina 5K displays (2561px - 3200px) */
-@media (min-width: 2561px) and (max-width: 3200px) {
-    .parameters-panel {
-        max-width: 2000px;
-        padding: 0 10vw;
-    }
+/* Retina 5K displays (1921px - 3200px) */
+@media (min-width: 1921px) and (max-width: 3200px) {
+    .parameters-panel { max-width: 2000px; padding: 0 10vw; }
+    .graph-section { max-width: 2000px; }
 }
 
 /* TV / projector (3201px+) */
 @media (min-width: 3201px) {
-    .parameters-panel {
-        max-width: 2400px;
-        padding: 0 12vw;
-    }
+    .parameters-panel { max-width: 2400px; padding: 0 12vw; }
+    .graph-section { max-width: 2400px; }
 }

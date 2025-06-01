@@ -1,84 +1,75 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import WeatherGraph from '../components/WeatherGraph';
-import CalendarExample from '../components/calendar';
+import Calendar from '../components/Calendar';
 import LocationSelector from '../components/parameters/LocationSelector';
 import MorphotypesSelector from '../components/parameters/MorphotypesSelector';
 import MeteorologicalConditionsSelector from '../components/parameters/MeteorologicalConditionsSelector';
 import GraphTypeSelector from '../components/parameters/GraphTypeSelector';
-import '../styles/MainView.css';
 import { useTranslation } from 'react-i18next';
-import dayjs from "dayjs";
-import '../styles/responsive.css'
+import dayjs from 'dayjs';
+import '../styles/MainView.css';
+import '../styles/responsive.css';
 
 const paramKeys = {
-    "Temperature": "temperature",
-    "Humidity": "humidity",
-    "Precipitation": "precipitation",
-    "Wind speed": "wind_speed",
-    "Wind direction": "wind_direction"
+    Temperature: 'temperature',
+    Humidity: 'humidity',
+    Precipitation: 'precipitation',
+    'Wind speed': 'wind_speed',
+    'Wind direction': 'wind_direction',
 };
 
 const cityLabelToBackend = {
-    'Vilnius': 'Vilnius',
-    'Šiauliai': 'Siauliai',
-    'Klaipėda': 'Klaipeda'
+    Vilnius: 'Vilnius',
+    Šiauliai: 'Siauliai',
+    Klaipėda: 'Klaipeda',
 };
 
 const morphotypeNameToCode = {
-    Alnus: "ALNU",
-    Artemisia: "ARTE",
-    Ambrosia: "AMBR",
-    Corylus: "CORY",
-    Betula: "BETU",
-    Quercus: "QUER",
-    Pinus: "PINA",
-    Poaceae: "POAC",
-    Salix: "SALI",
-    Populus: "POPU",
-    Acer: "ACER"
+    Alnus: 'ALNU',
+    Artemisia: 'ARTE',
+    Ambrosia: 'AMBR',
+    Corylus: 'CORY',
+    Betula: 'BETU',
+    Quercus: 'QUER',
+    Pinus: 'PINA',
+    Poaceae: 'POAC',
+    Salix: 'SALI',
+    Populus: 'POPU',
+    Acer: 'ACER',
 };
 
 const pollenDateFieldMap = {
-    Vilnius: "LTVILN",
-    Siauliai: "LTSIAU",
-    Klaipeda: "LTKLAI"
+    Vilnius: 'LTVILN',
+    Siauliai: 'LTSIAU',
+    Klaipeda: 'LTKLAI',
 };
 
 const MainView = () => {
+    const { t } = useTranslation();
     const [selectedCity, setSelectedCity] = useState(null);
-    const [selectedDate, setSelectedDate] = useState('');
+    const [selectedDate, setSelectedDate] = useState([null, null]);
     const [selectedParams, setSelectedParams] = useState([]);
     const [selectedGraph, setSelectedGraph] = useState('');
     const [weatherData, setWeatherData] = useState([]);
     const [error, setError] = useState('');
     const [isGraphVisible, setIsGraphVisible] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [granularity, setGranularity] = useState('hourly'); // always hourly
-    const { t } = useTranslation();
 
-    useEffect(() => {
-        if (!isGraphVisible) return;
-        fetchData(granularity);
-        // eslint-disable-next-line
-    }, [granularity, isGraphVisible]);
-
-    const handleCalendarSelect = (dateRange) => {
-        setSelectedDate(dateRange);
-    };
-
-    const fetchData = async (gran) => {
-        if (!selectedCity || !selectedDate || selectedDate.length !== 2) {
-            setError('Please select city and date range');
+    const handleShowGraph = async () => {
+        if (!selectedCity || !selectedDate[0] || !selectedDate[1]) {
+            setError(t('Please select city and date range'));
             return;
         }
         setLoading(true);
         setError('');
-        try {
-            const [userStartDate, userEndDate] = selectedDate || [];
-            const startStr = userStartDate ? dayjs(userStartDate).format('YYYY-MM-DD') : '';
-            const endStr = userEndDate ? dayjs(userEndDate).format('YYYY-MM-DD') : '';
+        setIsGraphVisible(false);
 
-            // Prepare date strings for weather fetch (inclusive)
+        try {
+            const [startDate, endDate] = selectedDate;
+            const startStr = dayjs(startDate).format('YYYY-MM-DD');
+            const endStr = dayjs(endDate).format('YYYY-MM-DD');
+
+            // Build date array
             const dates = [];
             let current = new Date(startStr);
             const end = new Date(endStr);
@@ -96,7 +87,7 @@ const MainView = () => {
                     body: JSON.stringify({
                         stationCode: selectedCity.code,
                         date: day,
-                        granularity: gran,
+                        granularity: 'hourly',
                     }),
                 });
                 if (response.ok) {
@@ -105,22 +96,22 @@ const MainView = () => {
                 }
             }
 
-            // Prepare morphotype codes for pollen fetch
+            // Prepare morphotype codes
             const morphotypes = selectedParams
                 .filter(p => !Object.values(paramKeys).includes(p) && !paramKeys[p])
                 .map(name => morphotypeNameToCode[name])
                 .filter(Boolean);
 
-            // Always use backend city name for pollen request and field lookup
+            // Get backend city and pollen field
             const backendCity = cityLabelToBackend[selectedCity.label];
             const pollenDateField = pollenDateFieldMap[backendCity];
             if (!pollenDateField) {
-                setError('Invalid city selection');
+                setError(t('Invalid city selection'));
                 setLoading(false);
                 return;
             }
 
-            // Fetch pollen data if morphotypes are selected
+            // Fetch pollen data if needed
             let pollenData = [];
             if (morphotypes.length > 0) {
                 const pollenResponse = await fetch('http://localhost:3001/pollen', {
@@ -130,14 +121,14 @@ const MainView = () => {
                         stationName: backendCity,
                         startDate: startStr,
                         endDate: endStr,
-                        morphotypes: morphotypes,
-                        granularity: gran,
+                        morphotypes,
+                        granularity: 'hourly',
                     }),
                 });
                 pollenData = pollenResponse.ok ? await pollenResponse.json() : [];
             }
 
-            // Merge pollen data into weather data using correct date field
+            // Merge pollen into weather data
             const mergedData = allWeatherData.map(wd => {
                 const merged = { ...wd };
                 morphotypes.forEach(morph => {
@@ -159,43 +150,28 @@ const MainView = () => {
                 return merged;
             });
 
-            // Filter merged data to only include entries within the user-selected date range
-            const startObj = new Date(startStr);
-            const endObj = new Date(endStr);
-            const filteredData = mergedData.filter(d => {
-                const dt = new Date(d.time);
-                return dt >= startObj && dt <= endObj;
-            });
-
-            setWeatherData(filteredData);
-        } catch (err) {
-            setError('Failed to load data');
-            setWeatherData([]);
+            setWeatherData(mergedData);
+            setIsGraphVisible(true);
+        } catch {
+            setError(t('Failed to load data'));
+            setIsGraphVisible(false);
         } finally {
             setLoading(false);
         }
     };
 
-    const handleShowGraph = async () => {
-        setGranularity('hourly'); // always start with hourly
-        setIsGraphVisible(true);
-        await fetchData('hourly');
-    };
-
-    // No handleSwitchGranularity needed, as we never switch to daily
-
     const handleReset = () => {
         setSelectedCity(null);
         setSelectedGraph('');
         setSelectedParams([]);
-        setSelectedDate('');
+        setSelectedDate([null, null]);
         setWeatherData([]);
         setError('');
         setIsGraphVisible(false);
-        setGranularity('hourly');
     };
 
-    const isAnyFilterSelected = selectedCity || selectedGraph || selectedParams.length > 0 || selectedDate;
+    const isAnyFilterSelected =
+        selectedCity || selectedGraph || selectedParams.length > 0 || (selectedDate && (selectedDate[0] || selectedDate[1]));
 
     return (
         <div className="section">
@@ -203,7 +179,12 @@ const MainView = () => {
                 <div className="block left-col">
                     <h3 className="section-title">{t('location')}</h3>
                     <LocationSelector selectedCity={selectedCity} setSelectedCity={setSelectedCity} />
-                    <CalendarExample onDateSelect={handleCalendarSelect} selectedDate={selectedDate} />
+                    <Calendar
+                        selectedDate={selectedDate}
+                        setSelectedDate={setSelectedDate}
+                        error={error}
+                        setError={setError}
+                    />
                 </div>
                 <div className="block block-morphotypes middle-col">
                     <h3 className="section-title">{t('morphotypes')}</h3>
@@ -212,36 +193,38 @@ const MainView = () => {
                 <div className="block right-col">
                     <h3 className="section-title">{t('meteorologicalConditions')}</h3>
                     <MeteorologicalConditionsSelector selectedParams={selectedParams} setSelectedParams={setSelectedParams} />
-                    <h3 className="section-title" style={{ marginTop: '20px' }}>{t('typeOfGraph')}</h3>
+                    <h3 className="section-title" style={{ marginTop: 20 }}>{t('typeOfGraph')}</h3>
                     <GraphTypeSelector selectedGraph={selectedGraph} setSelectedGraph={setSelectedGraph} />
                 </div>
             </div>
             <div className="buttons-container">
-                <div className="button-wrapper">
-                    <button className="show-button" onClick={handleShowGraph} disabled={loading}>
-                        {loading ? t('loading') : t('showGraph')}
+                <button
+                    className="show-button"
+                    onClick={handleShowGraph}
+                    disabled={loading}
+                >
+                    {loading ? t('loading') : t('showGraph')}
+                </button>
+                {isAnyFilterSelected && (
+                    <button
+                        className="reset-button"
+                        onClick={handleReset}
+                        disabled={loading}
+                    >
+                        {t('reset')}
                     </button>
-                </div>
-                <div className="button-wrapper">
-                    {isAnyFilterSelected && (
-                        <button className="reset-button visible" onClick={handleReset} disabled={loading}>
-                            {t('reset')}
-                        </button>
-                    )}
-                </div>
+                )}
             </div>
             {error && <div className="error">{error}</div>}
             {isGraphVisible && (
-                <>
-                    <div className="graph-section">
-                        <WeatherGraph
-                            weatherData={weatherData}
-                            selectedGraph={selectedGraph}
-                            selectedParams={selectedParams}
-                            granularity={granularity}
-                        />
-                    </div>
-                </>
+                <div className="graph-section">
+                    <WeatherGraph
+                        weatherData={weatherData}
+                        selectedGraph={selectedGraph}
+                        selectedParams={selectedParams}
+                        granularity="hourly"
+                    />
+                </div>
             )}
         </div>
     );
