@@ -1,10 +1,15 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const pollenRouter = require('./pollen');
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
 const app = express();
 const PORT = 3001;
+app.use(express.static(path.join(__dirname, '../../build')));
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '../../build', 'index.html'));
+});
 
 app.use(cors());
 app.use(express.json());
@@ -13,7 +18,6 @@ app.use('/', pollenRouter);
 app.post('/weather', async (req, res) => {
     const { stationCode, date, granularity } = req.body;
 
-    // meteo.lt API only provides hourly data, so just return all observations for the day
     const url = date
         ? `https://api.meteo.lt/v1/stations/${stationCode}/observations/${date}`
         : `https://api.meteo.lt/v1/stations/${stationCode}/observations/latest`;
@@ -36,7 +40,6 @@ app.post('/weather', async (req, res) => {
             wind_direction: obs.windDirection
         }));
 
-        // If daily granularity, aggregate by day (average)
         if (granularity === 'daily' && observations.length > 0) {
             const day = observations[0].time.slice(0, 10);
             const avg = arr => arr.reduce((a, b) => a + b, 0) / arr.length;
