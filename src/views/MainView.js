@@ -77,7 +77,7 @@ const MainView = () => {
             }
             const allWeatherData = [];
             for (const day of dates) {
-                const response = await fetch('http://84.32.188.59:3001/weather', {
+                const response = await fetch('/weather', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -104,7 +104,7 @@ const MainView = () => {
             }
             let pollenData = [];
             if (morphotypes.length > 0) {
-                const pollenResponse = await fetch('http://84.32.188.59:3001/pollen', {
+                const pollenResponse = await fetch('/pollen', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
