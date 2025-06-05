@@ -33,8 +33,11 @@ export default function App() {
 
             {/* Footer */}
             <footer className={`footer ${isDarkMode ? 'dark' : ''}`}>
-                Pollen&Meteo 2025
+                <div>
+                    Pollen&Meteo &copy; {new Date().getFullYear()} @krovostcora. All rights reserved.
+                </div>
             </footer>
+
         </div>
     );
 }

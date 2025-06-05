@@ -1,6 +1,8 @@
 {
-  "name": "practice",
-  "version": "0.1.0",
+  "name": "pollen&meteo",
+  "version": "1.0.0",
+  "author": "Anna Kutova / @krovostcora",
+  "license": "MIT",
   "private": true,
   "scripts": {
     "start": "react-scripts start",
