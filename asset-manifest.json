@@ -1,17 +1,17 @@
 {
   "files": {
-    "main.css": "/static/css/main.ffde2040.css",
-    "main.js": "/static/js/main.8f42ef64.js",
-    "static/js/977.9a8c9996.chunk.js": "/static/js/977.9a8c9996.chunk.js",
-    "static/js/455.5fa82192.chunk.js": "/static/js/455.5fa82192.chunk.js",
-    "index.html": "/index.html",
-    "main.ffde2040.css.map": "/static/css/main.ffde2040.css.map",
-    "main.8f42ef64.js.map": "/static/js/main.8f42ef64.js.map",
-    "977.9a8c9996.chunk.js.map": "/static/js/977.9a8c9996.chunk.js.map",
-    "455.5fa82192.chunk.js.map": "/static/js/455.5fa82192.chunk.js.map"
+    "main.css": "/Pollen-Meteo/static/css/main.ffde2040.css",
+    "main.js": "/Pollen-Meteo/static/js/main.b1d3c400.js",
+    "static/js/977.9a8c9996.chunk.js": "/Pollen-Meteo/static/js/977.9a8c9996.chunk.js",
+    "static/js/455.5fa82192.chunk.js": "/Pollen-Meteo/static/js/455.5fa82192.chunk.js",
+    "index.html": "/Pollen-Meteo/index.html",
+    "main.ffde2040.css.map": "/Pollen-Meteo/static/css/main.ffde2040.css.map",
+    "main.b1d3c400.js.map": "/Pollen-Meteo/static/js/main.b1d3c400.js.map",
+    "977.9a8c9996.chunk.js.map": "/Pollen-Meteo/static/js/977.9a8c9996.chunk.js.map",
+    "455.5fa82192.chunk.js.map": "/Pollen-Meteo/static/js/455.5fa82192.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.ffde2040.css",
-    "static/js/main.8f42ef64.js"
+    "static/js/main.b1d3c400.js"
   ]
 }
